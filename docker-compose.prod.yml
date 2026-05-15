@@ -1,0 +1,51 @@
+# FacturaSolwed — Producción self-hosted
+# Uso: docker compose -f docker-compose.prod.yml up -d
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        APP_ENV: production
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-80}:80"
+    volumes:
+      - myfiles:/var/www/html/MyFiles
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FS_DB_TYPE: postgresql
+      FS_DB_HOST: db
+      FS_DB_PORT: 5432
+      FS_DB_NAME: ${DB_NAME:-facturascripts}
+      FS_DB_USER: ${DB_USER:-fs_user}
+      FS_DB_PASS: ${DB_PASS}
+      FS_LANG: ${FS_LANG:-es_ES}
+      FS_TIMEZONE: ${FS_TIMEZONE:-Europe/Madrid}
+      FS_DEBUG: "false"
+      FS_COOKIES_EXPIRE: 604800
+      FS_API_KEY: ${FS_API_KEY}
+      # Telemetría SOLWED (opcional)
+      SOLWED_LICENSE_KEY: ${SOLWED_LICENSE_KEY:-}
+      SOLWED_TELEMETRY_URL: ${SOLWED_TELEMETRY_URL:-https://mind.solwed.es/api/erp-telemetry}
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-facturascripts}
+      POSTGRES_USER: ${DB_USER:-fs_user}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-fs_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  myfiles:
