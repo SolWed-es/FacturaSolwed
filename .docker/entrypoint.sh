@@ -28,11 +28,13 @@ define('FS_LANG',        '${FS_LANG:-es_ES}');
 define('FS_TIMEZONE',    '${FS_TIMEZONE:-Europe/Madrid}');
 define('FS_ROUTE',       '');
 define('FS_COOKIES_EXPIRE', 2592000);
-define('FS_DEBUG',       ${FS_DEBUG:-false});
-define('FS_DEV_MODE',    ${FS_DEV_MODE:-false});
-define('FS_DEV_USER',    '${FS_DEV_USER:-admin}');
+define('FS_DEBUG',            ${FS_DEBUG:-false});
+define('FS_DEV_MODE',         ${FS_DEV_MODE:-false});
+define('FS_DEV_USER',         '${FS_DEV_USER:-admin}');
 define('FS_MIND_CONNECT_SECRET', '${FS_MIND_CONNECT_SECRET:-}');
-define('GROQ_API_KEY',   '${GROQ_API_KEY:-}');
+define('GROQ_API_KEY',        '${GROQ_API_KEY:-}');
+define('FS_DISABLE_RM_PLUGINS', $([ "${FS_INSTANCE_TYPE:-self-hosted}" = "managed" ] && echo "true" || echo "false"));
+define('FS_HIDDEN_PLUGINS',   '${FS_HIDDEN_PLUGINS:-SolwedConnect}');
 EOF
 elif [ ! -f "$WEBROOT/config.php" ]; then
     echo "[entrypoint] Copiando config.php de plantilla dev..."

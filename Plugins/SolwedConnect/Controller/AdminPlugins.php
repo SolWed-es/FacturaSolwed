@@ -29,9 +29,22 @@ class AdminPlugins extends \FacturaScripts\Core\Controller\AdminPlugins
 
         // No Telemetry, no Forja
         $this->registered = true;
-        $this->updated = SolwedGitHub::canUpdateCore() === false;
 
         $this->licenseStatus = LicenseClient::getStatus();
+        $licenseActive = $this->licenseStatus['active'] ?? false;
+
+        // Con licencia: mostrar si hay update disponible
+        // Sin licencia: ocultar botón update pero mostrar aviso
+        $this->updated = $licenseActive
+            ? SolwedGitHub::canUpdateCore() === false
+            : true;  // "ya actualizado" → oculta el botón
+
+        // Aviso de suscripción inactiva
+        if (!$licenseActive && LicenseClient::getType() !== 'managed') {
+            Tools::log()->warning('Tu suscripción no está activa. No se están realizando ' .
+                'copias de seguridad ni actualizaciones de seguridad, estabilidad y legalidad. ' .
+                'Activa tu plan en app.solwed.es para restablecer el servicio.');
+        }
 
         $action = $this->request->inputOrQuery('action', '');
 
@@ -88,7 +101,7 @@ class AdminPlugins extends \FacturaScripts\Core\Controller\AdminPlugins
             return;
         }
 
-        $tmpFile = Tools::folder(Plugins::folder(), $pluginName . '.zip');
+        $tmpFile = Plugins::folder() . DIRECTORY_SEPARATOR . $pluginName . '.zip';
 
         $http = Http::get($downloadUrl)->setTimeout(30);
         if (false === $http->saveAs($tmpFile)) {

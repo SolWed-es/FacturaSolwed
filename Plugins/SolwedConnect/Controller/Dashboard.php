@@ -1,8 +1,7 @@
 <?php
 namespace FacturaScripts\Plugins\SolwedConnect\Controller;
 
-use FacturaScripts\Core\Response;
-use FacturaScripts\Dinamic\Model\User;
+use FacturaScripts\Core\Tools;
 use FacturaScripts\Plugins\SolwedConnect\Lib\LicenseClient;
 use FacturaScripts\Plugins\SolwedConnect\Lib\SolwedGitHub;
 
@@ -10,7 +9,7 @@ use FacturaScripts\Plugins\SolwedConnect\Lib\SolwedGitHub;
  * Sobreescribe Dashboard de NeoRazorX:
  * - Elimina Telemetry y Forja
  * - Elimina llamadas a facturascripts.com para noticias
- * - Añade estado de licencia Solwed
+ * - Muestra aviso si la suscripción no está activa
  */
 class Dashboard extends \FacturaScripts\Core\Controller\Dashboard
 {
@@ -21,12 +20,21 @@ class Dashboard extends \FacturaScripts\Core\Controller\Dashboard
     {
         parent::privateCore($response, $user, $permissions);
 
-        // sustituimos sin Telemetry ni Forja
         $this->registered = true;
-        $this->updated = SolwedGitHub::canUpdateCore() === false;
-        $this->news = []; // sin noticias de facturascripts.com
+        $this->news = [];
 
-        // estado de licencia Solwed
         $this->licenseStatus = LicenseClient::getStatus();
+        $licenseActive = $this->licenseStatus['active'] ?? false;
+
+        // Sin licencia: ocultar botón de update + aviso prominente
+        $this->updated = $licenseActive
+            ? SolwedGitHub::canUpdateCore() === false
+            : true;
+
+        if (!$licenseActive && LicenseClient::getType() !== 'managed') {
+            Tools::log()->warning('Tu suscripción no está activa. No se están realizando ' .
+                'copias de seguridad ni actualizaciones de seguridad, estabilidad y legalidad. ' .
+                'Activa tu plan en app.solwed.es para restablecer el servicio.');
+        }
     }
 }

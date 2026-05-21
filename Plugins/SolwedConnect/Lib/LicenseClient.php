@@ -160,11 +160,6 @@ class LicenseClient
     private static function verify(string $token): array
     {
         try {
-            $response = Http::get(self::BASE_URL . '/fs/license')
-                ->setHeader('Content-Type', 'application/json')
-                ->setTimeout(5);
-
-            // pasamos el token como query param según spec de la API
             $response = Http::get(self::BASE_URL . '/fs/license?token=' . urlencode($token))
                 ->setTimeout(5);
 

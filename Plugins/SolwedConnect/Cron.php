@@ -4,6 +4,8 @@ namespace FacturaScripts\Plugins\SolwedConnect;
 use FacturaScripts\Core\Kernel;
 use FacturaScripts\Core\Plugins;
 use FacturaScripts\Core\Template\CronClass;
+use FacturaScripts\Core\Where;
+use FacturaScripts\Dinamic\Model\User;
 use FacturaScripts\Plugins\SolwedConnect\Lib\LicenseClient;
 use FacturaScripts\Plugins\SolwedConnect\Lib\MindClient;
 
@@ -11,32 +13,31 @@ class Cron extends CronClass
 {
     public function run(): void
     {
-        // ping de telemetría cada 6 horas
-        if ($this->isTimeForJob('solwedconnect-ping', 6)) {
-            $this->sendTelemetry();
-            $this->markJobDone('solwedconnect-ping');
-        }
+        // telemetría cada 6 horas
+        $this->job('solwedconnect-ping')
+            ->every('6 hours')
+            ->run(function () {
+                $this->sendTelemetry();
+            });
 
         // reverificación de licencia cada 23 horas
-        if ($this->isTimeForJob('solwedconnect-license', 23)) {
-            LicenseClient::clearCache();
-            $this->markJobDone('solwedconnect-license');
-        }
+        $this->job('solwedconnect-license')
+            ->every('23 hours')
+            ->run(function () {
+                LicenseClient::clearCache();
+            });
     }
 
     private function sendTelemetry(): void
     {
-        $plugins = array_values(array_map(
-            fn($p) => $p->name,
-            array_filter(Plugins::list(), fn($p) => $p->enabled)
-        ));
+        $plugins = array_values(Plugins::enabled());
 
         $userCount = 0;
         try {
-            $userModel = new \FacturaScripts\Dinamic\Model\User();
-            $userCount = count($userModel->all([], [], 0, 0));
-        } catch (\Exception $e) {
-            // modelo no disponible
+            $user = new User();
+            $userCount = $user->count([Where::eq('enabled', true)]);
+        } catch (\Throwable $e) {
+            // modelo puede no estar disponible
         }
 
         MindClient::sendTelemetry(
