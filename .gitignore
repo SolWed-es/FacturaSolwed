@@ -33,5 +33,7 @@ package-lock.json
 .history
 
 # claude
-CLAUDE.md
 /.claude
+# FacturaSolwed — datos de instancias cliente
+clients/*/.env
+clients/*/docker-compose.override.yml
