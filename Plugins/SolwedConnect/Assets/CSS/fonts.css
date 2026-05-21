@@ -1,0 +1,56 @@
+/* ============================================
+   Chakra Petch — headings (alineado con solwed-app)
+   ============================================ */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../Fonts/chakra-petch-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../Fonts/chakra-petch-600.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../Fonts/chakra-petch-700.woff2) format('woff2');
+}
+/* ============================================
+   IBM Plex Sans — body text
+   Técnica, clara, profesional
+   ============================================ */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../Fonts/ibm-plex-sans-400.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../Fonts/ibm-plex-sans-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../Fonts/ibm-plex-sans-600.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../Fonts/ibm-plex-sans-700.woff2) format('woff2');
+}

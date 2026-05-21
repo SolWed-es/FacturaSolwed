@@ -1,0 +1,105 @@
+{# SolwedShadcn — Header top bar #}
+<header class="solwed-header d-print-none">
+    {# Izquierda: hamburger + botones #}
+    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <button type="button" class="solwed-header-icon"
+                onclick="toggleSidebar()" title="Menu">
+            <i data-lucide="menu" class="icon-md"></i>
+        </button>
+        <div id="headerPageActions" class="d-flex align-items-center gap-1"></div>
+    </div>
+
+    <script>
+        document.addEventListener('click', function(e) {
+            var desc = e.target.closest('.solwed-page-desc');
+            if (desc) {
+                navigator.clipboard.writeText(desc.textContent.trim());
+                desc.style.color = 'var(--success, #22c55e)';
+                setTimeout(function() { desc.style.color = ''; }, 800);
+            }
+        });
+    </script>
+
+    {# Derecha: título + iconos + usuario #}
+    <div class="d-flex align-items-center gap-1">
+        <div id="headerPageTitle" class="solwed-header-title"></div>
+        {% for includeView in getIncludeViews('MenuTemplate', 'MenuIconBefore') %}
+            {% include includeView['path'] %}
+        {% endfor %}
+
+        <a href="MegaSearch" id="menuIconSearch"
+           class="solwed-header-icon{{ template == 'MegaSearch.html.twig' ? ' active' : '' }}"
+           title="{{ trans('search') }}">
+            <i data-lucide="search" class="icon-sm"></i>
+        </a>
+
+        <a href="Dashboard" id="menuIconDashboard"
+           class="solwed-header-icon{{ template == 'Dashboard.html.twig' ? ' active' : '' }}"
+           title="{{ trans('dashboard') }}">
+            <i data-lucide="layout-dashboard" class="icon-sm"></i>
+        </a>
+
+        <a href="https://solwed.es/ayuda?controller={{ controllerName }}" id="menuIconHelp"
+           class="solwed-header-icon d-none d-sm-inline-flex"
+           rel="nofollow" target="_blank" title="{{ trans('help') }}">
+            <i data-lucide="circle-help" class="icon-sm"></i>
+        </a>
+
+        <div class="solwed-header-sep d-none d-sm-block"></div>
+
+        {# Menú usuario #}
+        <div class="dropdown">
+            <button type="button" class="user-chip" id="menuIconUser"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    title="{{ trans('user') }}">
+                {% if fsc.user.email %}
+                    <img src="{{ fsc.user.gravatar(32) }}" alt="{{ fsc.user.nick }}" class="user-chip-avatar-img"/>
+                {% else %}
+                    <span class="user-chip-avatar">{{ fsc.user.nick | slice(0,1) | upper }}</span>
+                {% endif %}
+                <span class="user-chip-nick d-none d-md-inline">{{ fsc.user.nick }}</span>
+                <i data-lucide="chevron-down" class="user-chip-chevron"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="menuIconUser">
+                <div class="user-dropdown-header">
+                    {% if fsc.user.email %}
+                        <img src="{{ fsc.user.gravatar(40) }}" alt="{{ fsc.user.nick }}" class="user-dropdown-avatar-img"/>
+                    {% else %}
+                        <span class="user-dropdown-avatar">{{ fsc.user.nick | slice(0,1) | upper }}</span>
+                    {% endif %}
+                    <div>
+                        <div class="user-dropdown-name">{{ fsc.user.nick }}</div>
+                        <div class="user-dropdown-role">{{ fsc.empresa.nombrecorto | raw }}</div>
+                    </div>
+                </div>
+                <div class="user-dropdown-divider"></div>
+                <a class="user-dropdown-item" href="{{ fsc.user.url() }}">
+                    <i data-lucide="user-round" class="user-dropdown-icon"></i>
+                    <span>{{ trans('my-profile') }}</span>
+                </a>
+                <a class="user-dropdown-item" href="SendMail">
+                    <i data-lucide="mail" class="user-dropdown-icon"></i>
+                    <span>{{ trans('send-mail') }}</span>
+                </a>
+                {% for includeView in getIncludeViews('MenuTemplate', 'MenuIconUser') %}
+                    {% include includeView['path'] %}
+                {% endfor %}
+                <div class="user-dropdown-divider"></div>
+                <a class="user-dropdown-item" href="#" onclick="solwedToggleTheme(); return false;">
+                    <i id="themeToggleIcon" data-lucide="moon" class="user-dropdown-icon"></i>
+                    <span id="themeToggleLabel">Modo oscuro</span>
+                </a>
+                <div class="user-dropdown-divider"></div>
+                <a class="user-dropdown-item user-dropdown-item--danger"
+                   href="{{ asset('login') }}?action=logout&multireqtoken={{ formToken(false) }}">
+                    <i data-lucide="log-out" class="user-dropdown-icon"></i>
+                    <span>{{ trans('logout') }}</span>
+                </a>
+            </div>
+        </div>
+
+        {% for includeView in getIncludeViews('MenuTemplate', 'MenuIconAfter') %}
+            {% include includeView['path'] %}
+        {% endfor %}
+    </div>
+</header>

@@ -1,12 +1,46 @@
+/cache/
+/Cache/
+/Dinamic/
+/doc/
+/MyFiles/
+/node_modules/
+/Plugins/*
+!/Plugins/SolwedConnect/
+/vendor/
+.DS_Store
+.htaccess
 config.php
-MyFiles/
-Dinamic/
-vendor/
-node_modules/
+config-mysql.php
+config-postgresql.php
+generateDoc.sh
+package-lock.json
+*.cache
+*.lock
 
-# Datos de clientes (credenciales)
-clients/*/.env
-clients/*/docker-compose.override.yml
+# Eclipse
+.buildpath
+.project
+.settings
 
-# Logs
-*.log
+# netbeans
+/nbproject/
+
+# phpstorm
+/.idea/
+
+# vscode
+.vscode
+*.code-workspace
+.history
+
+# claude
+CLAUDE.md
+/.claude
+
+# Web
+web/node_modules/
+web/dist/
+web/.astro/
+
+# Dev env
+.env.dev
