@@ -1,0 +1,12 @@
+config.php
+MyFiles/
+Dinamic/
+vendor/
+node_modules/
+
+# Datos de clientes (credenciales)
+clients/*/.env
+clients/*/docker-compose.override.yml
+
+# Logs
+*.log

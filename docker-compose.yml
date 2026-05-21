@@ -1,0 +1,39 @@
+# Template para una instancia de cliente FacturaSolwed
+# Uso: copiar a clients/{cliente}/docker-compose.yml y ajustar variables
+# O usar: scripts/new-client.sh {cliente}
+
+services:
+  erp:
+    image: ghcr.io/solwed-es/facturasolwed:latest
+    container_name: erp-${CLIENT_ID}
+    restart: unless-stopped
+    environment:
+      FS_DB_TYPE: postgresql
+      FS_DB_HOST: ${POSTGRES_HOST:-postgres}
+      FS_DB_PORT: ${POSTGRES_PORT:-5432}
+      FS_DB_NAME: erp_${CLIENT_ID}
+      FS_DB_USER: ${POSTGRES_USER:-fs_user}
+      FS_DB_PASS: ${POSTGRES_PASS}
+      FS_LANG: ${FS_LANG:-es_ES}
+      FS_TIMEZONE: ${FS_TIMEZONE:-Europe/Madrid}
+      MIND_API_URL: https://mind.solwed.es
+      MIND_API_KEY: ${MIND_API_KEY}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+    volumes:
+      - myfiles:/var/www/html/MyFiles
+    networks:
+      - erp-net
+      - proxy
+    labels:
+      - "caddy=${CLIENT_ID}.erpsolwed.es"
+      - "caddy.reverse_proxy={{upstreams 80}}"
+
+volumes:
+  myfiles:
+    name: erp-${CLIENT_ID}-myfiles
+
+networks:
+  erp-net:
+  proxy:
+    external: true
+    name: caddy-proxy
