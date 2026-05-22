@@ -1,0 +1,20 @@
+{
+    "solwedconnect-subscription": "Solwed Subscription",
+    "solwedconnect-status-active": "Active",
+    "solwedconnect-status-inactive": "Inactive",
+    "solwedconnect-plan": "Plan",
+    "solwedconnect-activate-license": "Activate license",
+    "solwedconnect-revoke-license": "Remove license",
+    "solwedconnect-revoke-confirm": "Remove the license from this installation?",
+    "solwedconnect-get-code": "Get code",
+    "solwedconnect-activation-code-placeholder": "Activation code (from app.solwed.es)",
+    "solwedconnect-mark-read": "Mark as read",
+    "solwedconnect-license-activated": "License activated successfully",
+    "solwedconnect-license-revoked": "License removed",
+    "solwedconnect-license-error": "Error activating license",
+    "solwedconnect-protected": "This installation is managed by Solwed and cannot be modified.",
+    "solwedconnect-update-available": "Update available",
+    "solwedconnect-up-to-date": "System is up to date",
+    "solwedconnect-updating": "Updating...",
+    "solwedconnect-no-license": "No active license"
+}

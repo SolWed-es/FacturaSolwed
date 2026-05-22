@@ -20,7 +20,7 @@
             <div class="text-end mb-2">
                 <a href="{{ fsc.url() }}?action=dismiss-notifications"
                    class="btn btn-sm btn-outline-secondary">
-                    Marcar como leídas
+                    {{ trans('solwedconnect-mark-read') }}
                 </a>
             </div>
         </div>
@@ -32,19 +32,19 @@
                 <div class="card-body py-2">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <small class="text-muted">Suscripción Solwed</small>
+                            <small class="text-muted">{{ trans('solwedconnect-subscription') }}</small>
                             {% if fsc.licenseStatus.active|default(false) %}
-                                <span class="badge bg-success ms-2">Activa</span>
+                                <span class="badge bg-success ms-2">{{ trans('solwedconnect-status-active') }}</span>
                                 <small class="text-muted ms-2">{{ fsc.licenseStatus.plan|default('') }}</small>
                             {% else %}
-                                <span class="badge bg-danger ms-2">Inactiva</span>
+                                <span class="badge bg-danger ms-2">{{ trans('solwedconnect-status-inactive') }}</span>
                             {% endif %}
                         </div>
                         {% if fsc.licenseStatus.active|default(false) %}
                             <a href="{{ fsc.url() }}?action=revoke-license&multireqtoken={{ fsc.multiRequestProtection.newToken() }}"
                                class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('¿Quitar la licencia de esta instalación?')">
-                                Quitar licencia
+                               onclick="return confirm('{{ trans('solwedconnect-revoke-confirm') }}')">
+                                {{ trans('solwedconnect-revoke-license') }}
                             </a>
                         {% endif %}
                     </div>
@@ -55,14 +55,14 @@
                             <input type="hidden" name="multireqtoken" value="{{ fsc.multiRequestProtection.newToken() }}">
                             <div class="input-group input-group-sm">
                                 <input type="text" name="license_code" class="form-control"
-                                       placeholder="Código de activación (desde app.solwed.es)"
+                                       placeholder="{{ trans('solwedconnect-activation-code-placeholder') }}"
                                        autocomplete="off" required>
                                 <button type="submit" class="btn btn-primary">
-                                    Activar licencia
+                                    {{ trans('solwedconnect-activate-license') }}
                                 </button>
                                 <a href="https://app.solwed.es/servicios/erp" target="_blank"
                                    class="btn btn-outline-secondary">
-                                    Obtener código
+                                    {{ trans('solwedconnect-get-code') }}
                                 </a>
                             </div>
                         </form>

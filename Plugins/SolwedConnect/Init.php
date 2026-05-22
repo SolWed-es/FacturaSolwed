@@ -23,7 +23,7 @@ class Init extends InitClass
         $envType  = getenv('FS_INSTANCE_TYPE') ?: 'self-hosted';
 
         $defaults = [
-            'mind_url'      => 'https://mind.solwed.es',
+            'mind_url'      => 'https://api.solwed.es',
             'mind_token'    => $envToken,
             'license_key'   => '',
             'instance_type' => $envType,
