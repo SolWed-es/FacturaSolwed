@@ -2,6 +2,14 @@
 
 Plugin oficial de Solwed para FacturaScripts. Conecta tu instalación con el ecosistema Solwed: gestión de suscripción, tienda de plugins y actualizaciones remotas.
 
+## Descarga
+
+| Versión | Descarga |
+|---------|---------|
+| v0.1.1 (última) | [SolwedConnect.zip](https://github.com/SolWed-es/FacturaSolwed/releases/download/SolwedConnect-v0.1.1/SolwedConnect.zip) |
+
+Todas las versiones: [github.com/SolWed-es/FacturaSolwed/releases](https://github.com/SolWed-es/FacturaSolwed/releases)
+
 ## Requisitos
 
 - FacturaScripts 2026 o superior
@@ -10,69 +18,57 @@ Plugin oficial de Solwed para FacturaScripts. Conecta tu instalación con el eco
 
 ## Instalación
 
-### Opción A — Desde el portal Solwed (recomendado)
+### Paso 1 — Descargar e instalar el plugin
+
+1. Descarga el ZIP de la [última versión](https://github.com/SolWed-es/FacturaSolwed/releases/latest)
+2. En tu FacturaScripts, ve a **Plugins → Subir plugin**
+3. Selecciona el ZIP descargado y súbelo
+4. Pulsa **Activar** en la lista de plugins
+
+### Paso 2 — Activar la licencia
 
 1. Accede a [app.solwed.es](https://app.solwed.es) → **Servicios → ERP**
-2. En la instalación pendiente, pulsa **Obtener código**
-3. En tu FacturaScripts, ve a **Plugins → Gestionar** e instala `SolwedConnect`
-4. Ve al **Dashboard** y pega el código de activación en el campo correspondiente
-5. Pulsa **Activar licencia**
+2. Pulsa **Obtener código** en tu instalación (válido 24 h)
+3. En tu FacturaScripts, abre el **Dashboard**
+4. En el bloque **Suscripción Solwed**, introduce el código y pulsa **Activar licencia**
 
-### Opción B — Instalación manual
+Al activar correctamente verás el plan asociado a tu suscripción (`principiante`, `estandar` o `profesional`).
 
-1. Descarga el ZIP desde la tienda de plugins:
-   ```
-   https://plugins.erpsolwed.es/zip/SolwedConnect.zip
-   ```
-2. En FacturaScripts, ve a **Plugins → Subir plugin** y sube el ZIP
-3. Activa el plugin desde la lista
-4. Sigue los pasos de activación del Opción A desde el punto 4
+### Instalación alternativa — Tienda de plugins Solwed
 
-### Opción C — Variables de entorno (instalaciones managed)
+Si ya tienes SolwedConnect activo en otra instalación, puedes instalar plugins directamente desde **Plugins → Tienda de plugins Solwed** sin descargar ZIPs manualmente.
 
-Las instalaciones gestionadas por Solwed se configuran automáticamente mediante variables de entorno en el contenedor:
+### Instalaciones managed (Solwed Cloud)
+
+Las instalaciones gestionadas por Solwed se configuran automáticamente mediante variables de entorno — no requieren código de activación manual:
 
 ```env
 FS_MIND_TOKEN=<token_asignado_por_solwed>
 FS_INSTANCE_TYPE=managed
 ```
 
-No requieren código de activación manual.
-
-## Activación
-
-Una vez instalado, el plugin muestra un bloque **Suscripción Solwed** en el Dashboard.
-
-Si la instalación está **pendiente de activación**:
-
-1. Ve a [app.solwed.es](https://app.solwed.es) → **Servicios → ERP**
-2. Pulsa **Obtener código** en tu instalación
-3. Copia el código (válido 24 h) y pégalo en el Dashboard del ERP
-4. Pulsa **Activar licencia**
-
-Al activar correctamente verás el plan asociado a tu suscripción (`principiante`, `estandar` o `profesional`).
-
 ## Configuración avanzada
 
 ### URL de la API (entornos privados)
 
-Por defecto el plugin apunta a `https://api.solwed.es`. Puedes sobreescribirlo en la configuración del plugin:
+Por defecto el plugin apunta a `https://api.solwed.es`. Puedes sobreescribirlo en:
 
 ```
 FacturaScripts → Configuración → SolwedConnect → mind_url
 ```
 
-Útil para entornos de staging o redes privadas.
+Útil para entornos de staging o redes internas sin acceso a internet.
 
 ## Funcionamiento
 
-| Función | Frecuencia |
-|---------|-----------|
-| Heartbeat (ping + notificaciones) | Cada 15 min (cron) |
-| Telemetría (plugins, usuarios, versión) | Cada 6 h (cron) |
-| Renovación de caché de licencia | Cada 23 h (cron) |
+| Tarea | Frecuencia |
+|-------|-----------|
+| Heartbeat (ping + notificaciones) | Cada 15 min |
+| Telemetría (plugins, usuarios, versión) | Cada 6 h |
+| Renovación de caché de licencia | Cada 23 h |
 
 El cron de FacturaScripts debe estar activo:
+
 ```bash
 */15 * * * * cd /ruta/facturascripts && php index.php -cron >> /dev/null 2>&1
 ```
@@ -81,14 +77,14 @@ El cron de FacturaScripts debe estar activo:
 
 Si el servidor no tiene acceso a internet o la API no responde:
 
-- Si existe una verificación previa en caché (< 72 h) → se usa esa, marcada como `grace`
-- Si no hay caché → la instalación sigue funcionando con `plan: none` (sin restricciones de uso)
+- Si hay una verificación previa en caché (menos de 72 h) → se usa esa, marcada como `grace`
+- Si no hay caché previa → la instalación sigue funcionando con `plan: none`
 
 El plugin **nunca bloquea el ERP** por falta de conexión.
 
 ## Actualizar el plugin
 
-Desde el Dashboard → bloque **Suscripción Solwed** → botón **Actualizaciones** (si hay nueva versión disponible).
+Desde el Dashboard → bloque **Suscripción Solwed** → botón **Actualizaciones** (si hay nueva versión).
 
 O desde **Plugins → Tienda de plugins Solwed**.
 
