@@ -21,7 +21,6 @@ class MindClient
     public static function emit(string $evento, array $payload = []): void
     {
         $token = Tools::settings('solwedconnect', 'mind_token', '');
-        $instalacionId = Tools::settings('solwedconnect', 'instalacion_id', '');
 
         if (empty($token)) {
             return;
@@ -29,7 +28,6 @@ class MindClient
 
         try {
             Http::postJson(self::BASE_URL . '/fs-eventos/evento', [
-                'instalacion_id' => $instalacionId ?: null,
                 'evento' => $evento,
                 'payload' => $payload,
             ])
@@ -62,6 +60,26 @@ class MindClient
                 ->ok();
         } catch (\Exception $e) {
             // silenciar
+        }
+    }
+
+    public static function sendHeartbeat(string $fsVersion): void
+    {
+        $token = Tools::settings('solwedconnect', 'mind_token', '');
+        if (empty($token)) {
+            return;
+        }
+
+        try {
+            Http::postJson(self::BASE_URL . '/fs/heartbeat', [
+                'fs_version' => $fsVersion,
+                'php_version' => PHP_VERSION,
+            ])
+                ->setHeader('X-Mind-Token', $token)
+                ->setTimeout(5)
+                ->ok();
+        } catch (\Exception $e) {
+            // silenciar — el heartbeat no debe romper el cron
         }
     }
 
