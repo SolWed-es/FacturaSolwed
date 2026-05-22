@@ -16,7 +16,7 @@ class LicenseClient
     const CACHE_KEY  = 'solwedconnect_license';
     const CACHE_TTL  = 86400;    // 24h en segundos
     const GRACE_TTL  = 259200;   // 72h en segundos
-    const BASE_URL   = 'https://api.solwed.es';
+    /** @deprecated Usar MindClient::baseUrl() — respeta el setting mind_url */
 
     const FEATURES = [
         'principiante' => [
@@ -105,7 +105,7 @@ class LicenseClient
     public static function activate(string $code, string $url, string $nombre): array
     {
         try {
-            $response = Http::postJson(self::BASE_URL . '/fs/activate', [
+            $response = Http::postJson(MindClient::baseUrl() . '/fs/activate', [
                 'code' => $code,
                 'url' => $url,
                 'nombre' => $nombre,
@@ -155,11 +155,13 @@ class LicenseClient
     private static function verify(string $token): array
     {
         try {
-            $response = Http::get(self::BASE_URL . '/fs/license?token=' . urlencode($token))
+            $response = Http::get(MindClient::baseUrl() . '/fs/license?token=' . urlencode($token))
                 ->setTimeout(5);
 
             if ($response->status() === 200) {
-                $data = $response->json() ?? [];
+                $raw  = $response->json() ?? [];
+                // Soporta respuesta directa {active,plan,...} y wrapped {success,data:{...}}
+                $data = isset($raw['data']) && is_array($raw['data']) ? $raw['data'] : $raw;
                 $plan = (string)($data['plan'] ?? 'none');
                 $status = [
                     'active'              => (bool)($data['active'] ?? false),

@@ -20,6 +20,11 @@ class MindClient
 {
     const BASE_URL = 'https://api.solwed.es';
 
+    public static function baseUrl(): string
+    {
+        return rtrim(Tools::settings('solwedconnect', 'mind_url', self::BASE_URL), '/');
+    }
+
     public static function emit(string $evento, array $payload = []): void
     {
         $token = Tools::settings('solwedconnect', 'mind_token', '');
@@ -28,7 +33,7 @@ class MindClient
         }
 
         try {
-            Http::postJson(self::BASE_URL . '/fs/eventos/evento', [
+            Http::postJson(self::baseUrl() . '/fs/eventos/evento', [
                 'evento' => $evento,
                 'payload' => $payload,
             ])
@@ -59,7 +64,7 @@ class MindClient
         }
 
         try {
-            Http::put(self::BASE_URL . '/fs/eventos/instalacion/' . $instalacionId . '/telemetria', [
+            Http::put(self::baseUrl() . '/fs/eventos/instalacion/' . $instalacionId . '/telemetria', [
                 'plugins'    => $plugins,
                 'user_count' => $userCount,
                 'fs_version' => $fsVersion,
@@ -87,7 +92,7 @@ class MindClient
         }
 
         try {
-            $response = Http::postJson(self::BASE_URL . '/fs/heartbeat', [
+            $response = Http::postJson(self::baseUrl() . '/fs/heartbeat', [
                 'fs_version' => $fsVersion,
                 'php_version' => PHP_VERSION,
             ])
@@ -114,7 +119,7 @@ class MindClient
         }
 
         try {
-            Http::postJson(self::BASE_URL . '/fs/notificaciones/leidas', [])
+            Http::postJson(self::baseUrl() . '/fs/notificaciones/leidas', [])
                 ->setHeader('X-Mind-Token', $token)
                 ->setTimeout(5)
                 ->ok();
@@ -129,7 +134,7 @@ class MindClient
     public static function resolveInstallation(string $token): ?int
     {
         try {
-            $response = Http::get(self::BASE_URL . '/fs/eventos/instalacion-por-token?token=' . urlencode($token))
+            $response = Http::get(self::baseUrl() . '/fs/eventos/instalacion-por-token?token=' . urlencode($token))
                 ->setTimeout(5);
 
             if ($response->status() === 200) {
