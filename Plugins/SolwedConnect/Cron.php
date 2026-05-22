@@ -13,6 +13,13 @@ class Cron extends CronClass
 {
     public function run(): void
     {
+        // heartbeat cada 15 minutos — Mind detecta instancias caídas
+        $this->job('solwedconnect-heartbeat')
+            ->every('15 minutes')
+            ->run(function () {
+                MindClient::sendHeartbeat((string) Kernel::version());
+            });
+
         // telemetría cada 6 horas
         $this->job('solwedconnect-ping')
             ->every('6 hours')
