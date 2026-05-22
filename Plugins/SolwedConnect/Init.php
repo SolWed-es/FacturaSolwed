@@ -22,18 +22,31 @@ class Init extends InitClass
 
     public function update(): void
     {
-        // settings por defecto
+        // Si viene del entorno (instancia managed recién provisionada), tiene prioridad
+        $envToken = defined('FS_MIND_TOKEN') ? FS_MIND_TOKEN : '';
+        $envType  = getenv('FS_INSTANCE_TYPE') ?: 'self-hosted';
+
         $defaults = [
-            'mind_url' => 'https://mind.solwed.es',
-            'mind_token' => '',
-            'license_key' => '',
-            'instance_type' => getenv('FS_INSTANCE_TYPE') ?: 'self-hosted',
+            'mind_url'      => 'https://mind.solwed.es',
+            'mind_token'    => $envToken,
+            'license_key'   => '',
+            'instance_type' => $envType,
         ];
+
         foreach ($defaults as $key => $default) {
-            if (Tools::settings('solwedconnect', $key, '__missing__') === '__missing__') {
+            $current = Tools::settings('solwedconnect', $key, '__missing__');
+
+            // Escribir si: nunca se ha guardado, o si el env tiene un valor nuevo
+            if ($current === '__missing__') {
                 Tools::settingsSet('solwedconnect', $key, $default);
+            } elseif ($key === 'mind_token' && !empty($envToken) && $current !== $envToken) {
+                // El token del entorno siempre gana (permite re-provisioning)
+                Tools::settingsSet('solwedconnect', $key, $envToken);
+            } elseif ($key === 'instance_type' && $current !== $envType) {
+                Tools::settingsSet('solwedconnect', $key, $envType);
             }
         }
+
         Tools::settingsSave();
     }
 

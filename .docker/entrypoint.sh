@@ -35,6 +35,7 @@ define('FS_MIND_CONNECT_SECRET', '${FS_MIND_CONNECT_SECRET:-}');
 define('GROQ_API_KEY',        '${GROQ_API_KEY:-}');
 define('FS_DISABLE_RM_PLUGINS', $([ "${FS_INSTANCE_TYPE:-self-hosted}" = "managed" ] && echo "true" || echo "false"));
 define('FS_HIDDEN_PLUGINS',   '${FS_HIDDEN_PLUGINS:-SolwedConnect}');
+define('FS_MIND_TOKEN',       '${FS_MIND_TOKEN:-}');
 EOF
 elif [ ! -f "$WEBROOT/config.php" ]; then
     echo "[entrypoint] Copiando config.php de plantilla dev..."
