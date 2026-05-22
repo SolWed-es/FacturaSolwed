@@ -1,0 +1,1110 @@
+/* SolwedTheme - Dark Mode - Sin Bordes */
+/* ESTILOS EXCLUSIVOS PARA TEMA OSCURO */
+/* Estos estilos solo se aplicarán cuando el atributo data-bs-theme o data-theme sea "dark" */
+
+/* ===== VARIABLES DE COLOR ===== */
+:root[data-bs-theme="dark"],
+:root[data-theme="dark"] {
+  /* Colores base */
+  --monokai-bg: #333d3e;        /* Color principal */
+  --monokai-fg: #f8f8f2;        /* Texto principal */
+  --monokai-comment: #75715e;   /* Comentarios */
+  --monokai-selection: #3e3d32; /* Selección de texto */
+  
+  /* Colores de acento */
+  --monokai-red: #f92672;       /* Errores, advertencias */
+  --monokai-orange: #fd971f;    /* Números, constantes */
+  --monokai-yellow: #e6db74;    /* Strings, templates */
+  --monokai-green: #a6e22e;  /* Atributos, etiquetas */
+  
+  /* Colores de interfaz */
+  --monokai-bg-light: #3d4748;  /* Fondo de elementos */
+  --monokai-bg-lighter: #4a5455;/* Fondo hover/active */
+  --solwed-yellow: #f6e200;     /* Amarillo Solwed para selección */
+  --solwed-yellow-hover: rgba(var(--bs-warning-rgb), 0.2); /* Fondo hover con amarillo */
+}
+
+/* ===== ESTILOS GLOBALES TEMA OSCURO ===== */
+/* Solo se aplican cuando el tema oscuro está activo */
+:root[data-bs-theme="dark"], 
+:root[data-theme="dark"],
+[data-bs-theme="dark"] body, 
+[data-theme="dark"] body,
+html[data-bs-theme="dark"],
+html[data-theme="dark"] {
+  color-scheme: dark !important;
+  
+  /* Variables de Bootstrap para tema oscuro */
+  --bs-body-bg: var(--monokai-bg) !important;
+  --bs-body-color: var(--monokai-fg) !important;
+  --bs-border-color: var(--monokai-bg-lighter) !important;
+  --bs-secondary-bg: var(--monokai-bg-light) !important;
+  --bs-tertiary-bg: var(--monokai-bg-lighter) !important;
+  
+  /* Texto y fondos */
+  color: var(--monokai-fg) !important;
+  background-color: var(--monokai-bg) !important;
+}
+
+
+
+/* Asegurar que el tema claro use los estilos por defecto */
+:root[data-bs-theme="light"],
+:root[data-theme="light"],
+[data-bs-theme="light"] body,
+[data-theme="light"] body,
+html[data-bs-theme="light"],
+html[data-theme="light"] {
+  /* No sobrescribir estilos - dejar que se apliquen los estilos por defecto */
+  all: unset;
+}
+
+/* Asegurar que los inputs y botones no tengan outline */
+input,
+button,
+select,
+textarea,
+a {
+  outline: none !important;
+}
+
+/* Eliminar bordes de los elementos de formulario */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+select,
+textarea {
+  border: none !important;
+  background-color: var(--monokai-bg-light) !important;
+  color: var(--monokai-fg) !important;
+  padding: 0.5rem;
+}
+
+/* Estilo para los placeholders */
+::placeholder {
+  color: var(--monokai-comment) !important;
+  opacity: 1;
+}
+
+/* Eliminar estilos de focus */
+*:focus {
+  outline: none !important;
+}
+
+/* Asegurar que los enlaces no tengan subrayado por defecto */
+a {
+  text-decoration: none !important;
+  color: var(--monokai-blue) !important;
+}
+
+a:hover {
+  text-decoration: underline !important;
+  color: var(--monokai-green) !important;
+}
+
+/* ===== ELEMENTOS BASE ===== */
+/* Cuerpo y contenedores */
+body,
+.page-wrapper,
+.app-container,
+.container,
+.container-fluid {
+  background-color: var(--monokai-bg) !important;
+  color: var(--monokai-fg) !important;
+}
+
+/* Encabezados */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--monokai-fg) !important;
+}
+
+/* ===== COMPONENTES ===== */
+/* Tarjetas */
+.card {
+  background-color: var(--monokai-bg-light) !important;
+}
+
+.card-header {
+  background-color: var(--monokai-bg-lighter) !important;
+}
+
+/* ===== FORMULARIOS ===== */
+.form-control,
+.form-select,
+.form-control:focus,
+.form-select:focus,
+.input-group-text,
+.form-control:disabled,
+.form-select:disabled,
+.form-control[readonly],
+.form-select[readonly] {
+  background-color: var(--monokai-bg-light) !important;
+  color: var(--monokai-fg) !important;
+  border: 1px solid var(--monokai-bg-lighter) !important;
+  transition: all var(--bs-transition-base);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+}
+
+/* Estilo para inputs en foco */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--monokai-blue) !important;
+  outline: none !important;
+}
+
+/* Estilo para inputs deshabilitados o de solo lectura */
+.form-control:disabled,
+.form-select:disabled,
+.form-control[readonly],
+.form-select[readonly] {
+  background-color: var(--monokai-bg) !important;
+  border-color: var(--monokai-bg-lighter) !important;
+  opacity: 0.8;
+}
+
+/* Estilo para inputs inválidos */
+.form-control.is-invalid,
+.form-select.is-invalid,
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+  border-color: var(--monokai-red) !important;
+  padding-right: calc(1.5em + 0.75rem);
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Estilo para inputs válidos */
+.form-control.is-valid,
+.form-select.is-valid,
+.was-validated .form-control:valid,
+.was-validated .form-select:valid {
+  border-color: var(--monokai-green) !important;
+  padding-right: calc(1.5em + 0.75rem);
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Estilo para etiquetas de formulario */
+.form-label,
+.col-form-label,
+.form-check-label {
+  color: var(--monokai-fg) !important;
+  margin-bottom: 0.5rem;
+}
+
+/* Estilo para texto de ayuda */
+.form-text {
+  color: var(--monokai-comment) !important;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+/* Estilo para grupos de formulario */
+.input-group-text {
+  background-color: var(--monokai-bg-lighter) !important;
+  border: 1px solid var(--monokai-bg-lighter) !important;
+  color: var(--monokai-fg) !important;
+}
+
+/* Estilo para checkboxes y radios */
+.form-check-input {
+  background-color: var(--monokai-bg-light) !important;
+  border: 1px solid var(--monokai-bg-lighter) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--monokai-blue) !important;
+  border-color: var(--monokai-blue) !important;
+}
+
+.form-check-input:focus {
+  border-color: var(--monokai-blue) !important;
+}
+
+/* ===== BOTONES ===== */
+.btn {
+  font-weight: 600 !important;
+  transition: all 0.2s ease-in-out !important;
+  padding: 0.5rem 1rem;
+  border: none !important;
+}
+
+/* Restaurar colores originales de Bootstrap para botones */
+.btn-primary {
+  --bs-btn-bg: #0d6efd;
+  --bs-btn-border-color: #0d6efd;
+  --bs-btn-hover-bg: #0b5ed7;
+  --bs-btn-hover-border-color: #0a58ca;
+  --bs-btn-active-bg: #0a58ca;
+  --bs-btn-active-border-color: #0a53be;
+  --bs-btn-disabled-bg: #0d6efd;
+  --bs-btn-disabled-border-color: #0d6efd;
+}
+
+.btn-secondary {
+  --bs-btn-bg: #6c757d;
+  --bs-btn-border-color: #6c757d;
+  --bs-btn-hover-bg: #5c636a;
+  --bs-btn-hover-border-color: #565e64;
+  --bs-btn-active-bg: #565e64;
+  --bs-btn-active-border-color: #51585e;
+  --bs-btn-disabled-bg: #6c757d;
+  --bs-btn-disabled-border-color: #6c757d;
+}
+
+.btn-success {
+  --bs-btn-bg: #198754;
+  --bs-btn-border-color: #198754;
+  --bs-btn-hover-bg: #157347;
+  --bs-btn-hover-border-color: #146c43;
+  --bs-btn-active-bg: #146c43;
+  --bs-btn-active-border-color: #13653f;
+  --bs-btn-disabled-bg: #198754;
+  --bs-btn-disabled-border-color: #198754;
+}
+
+.btn-danger {
+  --bs-btn-bg: #dc3545;
+  --bs-btn-border-color: #dc3545;
+  --bs-btn-hover-bg: #bb2d3b;
+  --bs-btn-hover-border-color: #b02a37;
+  --bs-btn-active-bg: #b02a37;
+  --bs-btn-active-border-color: #a52834;
+  --bs-btn-disabled-bg: #dc3545;
+  --bs-btn-disabled-border-color: #dc3545;
+}
+
+.btn-warning {
+  --bs-btn-bg: #ffc107;
+  --bs-btn-border-color: #ffc107;
+  --bs-btn-hover-bg: #ffca2c;
+  --bs-btn-hover-border-color: #ffc720;
+  --bs-btn-active-bg: #ffcd39;
+  --bs-btn-active-border-color: #ffc720;
+  --bs-btn-disabled-bg: #ffc107;
+  --bs-btn-disabled-border-color: #ffc107;
+  color: #000 !important;
+}
+
+.btn-info {
+  --bs-btn-bg: #0dcaf0;
+  --bs-btn-border-color: #0dcaf0;
+  --bs-btn-hover-bg: #31d2f2;
+  --bs-btn-hover-border-color: #25cff2;
+  --bs-btn-active-bg: #3dd5f3;
+  --bs-btn-active-border-color: #25cff2;
+  --bs-btn-disabled-bg: #0dcaf0;
+  --bs-btn-disabled-border-color: #0dcaf0;
+  color: #000 !important;
+}
+
+.btn-light {
+  --bs-btn-bg: #f8f9fa;
+  --bs-btn-border-color: #f8f9fa;
+  --bs-btn-hover-bg: #f9fafb;
+  --bs-btn-hover-border-color: #f9fafb;
+  --bs-btn-active-bg: #f9fafb;
+  --bs-btn-active-border-color: #f9fafb;
+  --bs-btn-disabled-bg: #f8f9fa;
+  --bs-btn-disabled-border-color: #f8f9fa;
+  color: #000 !important;
+}
+
+.btn-dark {
+  --bs-btn-bg: #212529;
+  --bs-btn-border-color: #212529;
+  --bs-btn-hover-bg: #424649;
+  --bs-btn-hover-border-color: #373b3e;
+  --bs-btn-active-bg: #4d5154;
+  --bs-btn-active-border-color: #373b3e;
+  --bs-btn-disabled-bg: #212529;
+  --bs-btn-disabled-border-color: #212529;
+  color: #fff !important;
+}
+
+/* Aplicar estilos a todos los botones */
+.btn {
+  background-color: var(--bs-btn-bg) !important;
+  border-color: var(--bs-btn-border-color) !important;
+  color: var(--bs-btn-color, #fff) !important;
+}
+
+.btn:hover {
+  background-color: var(--bs-btn-hover-bg) !important;
+  border-color: var(--bs-btn-hover-border-color) !important;
+}
+
+.btn:active, .btn.active {
+  background-color: var(--bs-btn-active-bg) !important;
+  border-color: var(--bs-btn-active-border-color) !important;
+}
+
+.btn:disabled, .btn.disabled {
+  background-color: var(--bs-btn-disabled-bg) !important;
+  border-color: var(--bs-btn-disabled-border-color) !important;
+  opacity: 0.65;
+}
+
+/* ===== TABLAS ===== */
+/* Reset de bordes para tablas */
+table,
+.table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid var(--monokai-bg-lighter) !important;
+  border-radius: 0.25rem !important;
+  overflow: hidden !important;
+}
+
+/* Estilos base para tablas */
+table,
+.table {
+  color: var(--monokai-fg) !important;
+  background-color: var(--monokai-bg-light) !important;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Asegurar que las celdas hereden el color de fondo */
+table td,
+table th,
+.table td,
+.table th {
+  background-color: inherit !important;
+  color: inherit !important;
+  border: none !important;
+  padding: 0.75rem !important;
+}
+
+/* Cabeceras de tabla */
+.table thead th {
+  background-color: var(--monokai-bg-lighter) !important;
+  color: var(--monokai-fg) !important;
+  font-weight: 600;
+  vertical-align: middle;
+  padding: 0.75rem !important;
+  border: none !important;
+  border-bottom: none !important;
+}
+
+/* Primera celda de la cabecera */
+.table thead th:first-child {
+  border-top-left-radius: 0.25rem !important;
+}
+
+/* Última celda de la cabecera */
+.table thead th:last-child {
+  border-top-right-radius: 0.25rem !important;
+}
+
+/* Última fila de la tabla */
+table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0.25rem !important;
+}
+
+table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0.25rem !important;
+}
+
+/* Estilos para tablas - Sobrescribir Bootstrap */
+.table {
+  --bs-table-bg: var(--monokai-bg-light) !important;
+  --bs-table-striped-bg: var(--monokai-bg-light) !important;
+  --bs-table-striped-color: var(--monokai-fg) !important;
+  --bs-table-hover-bg: var(--monokai-bg-lighter) !important;
+  --bs-table-hover-color: var(--monokai-fg) !important;
+  color: var(--monokai-fg) !important;
+  border-color: var(--monokai-bg-lighter) !important;
+}
+
+/* Filas de tabla - Estilo base */
+table tbody tr,
+.table tbody tr {
+  background-color: var(--monokai-bg-light) !important;
+  color: var(--monokai-fg) !important;
+  transition: none !important;
+}
+
+/* Desactivar efecto de rayas */
+.table-striped > tbody > tr:nth-of-type(odd) > *,
+.table-striped-columns > :not(caption) > tr > :nth-child(even) {
+  --bs-table-bg-type: var(--monokai-bg-light) !important;
+  background-color: var(--monokai-bg-light) !important;
+}
+
+/* Desactivar cualquier efecto hover */
+table tbody tr:hover,
+.table tbody tr:hover {
+  background-color: var(--monokai-bg-light) !important;
+  color: var(--monokai-fg) !important;
+  border: none !important;
+  outline: none !important;
+  filter: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Estilo de borde inferior para filas de tabla */
+table tbody tr,
+.table tbody tr {
+  border-top: none !important;
+  border-bottom: 1px solid rgba(var(--bs-black-rgb), 0.15) !important;
+}
+
+table tbody tr:last-child,
+.table tbody tr:last-child {
+  border-bottom: none !important;
+}
+
+table tbody tr td,
+.table tbody tr td {
+  border-top: none !important;
+  border-bottom: none !important;
+  border-right: 1px solid rgba(var(--bs-black-rgb), 0.1) !important;
+}
+
+/* Eliminar borde derecho de la última celda de cada fila */
+table tbody tr td:last-child,
+.table tbody tr td:last-child {
+  border-right: none !important;
+}
+
+/* ===== PESTAÑAS (TABS) ===== */
+.nav-tabs {
+  border-bottom: 1px solid var(--monokai-bg-lighter) !important;
+  margin-bottom: 1rem !important;
+}
+
+.nav-tabs .nav-link {
+  color: var(--monokai-fg) !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  border-top-left-radius: 0.25rem !important;
+  border-top-right-radius: 0.25rem !important;
+  padding: 0.5rem 1rem !important;
+  margin-right: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  border-color: var(--monokai-bg-lighter) var(--monokai-bg-lighter) var(--monokai-bg-lighter) !important;
+  background-color: var(--monokai-bg-light) !important;
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: var(--monokai-fg) !important;
+  background-color: var(--monokai-bg-light) !important;
+  border-color: var(--monokai-bg-lighter) var(--monokai-bg-lighter) var(--monokai-bg-light) !important;
+  border-bottom: 2px solid var(--solwed-yellow) !important;
+  font-weight: 600 !important;
+}
+
+.nav-tabs .nav-link.active:hover,
+.nav-tabs .nav-item.show .nav-link:hover {
+  background-color: var(--monokai-bg-light) !important;
+}
+
+/* Contenido de las pestañas */
+.tab-content {
+  padding: 1rem;
+  background-color: var(--monokai-bg-light) !important;
+  border: 1px solid var(--monokai-bg-lighter) !important;
+  border-top: none !important;
+  border-bottom-left-radius: 0.25rem !important;
+  border-bottom-right-radius: 0.25rem !important;
+}
+
+.tab-pane {
+  padding: 0.5rem 0 !important;
+}
+}
+
+/* Filas con hover - Aumentar especificidad */
+table tbody tr:hover,
+table tbody tr:hover td,
+table tbody tr:hover th,
+.table tbody tr:hover,
+.table tbody tr:hover td,
+.table tbody tr:hover th,
+.table-hover > tbody > tr:hover,
+.table-hover > tbody > tr:hover > td,
+.table-hover > tbody > tr:hover > th {
+  background-color: var(--monokai-bg-lighter) !important;
+  color: var(--monokai-fg) !important;
+}
+
+/* Filas activas/seleccionadas - Aumentar especificidad */
+table tbody tr.active,
+table tbody tr.active td,
+table tbody tr.active th,
+.table tbody tr.active,
+.table tbody tr.active td,
+.table tbody tr.active th,
+.table > tbody > tr.active > td,
+.table > tbody > tr.active > th,
+.table > tbody > tr.selected > td,
+.table > tbody > tr.selected > th,
+.table > tbody > tr:active > td,
+.table > tbody > tr:active > th,
+.table > tbody > tr:focus > td,
+.table > tbody > tr:focus > th,
+.table > tbody > tr:focus-within > td,
+.table > tbody > tr:focus-within > th,
+.table > tbody > tr:target > td,
+.table > tbody > tr:target > th {
+  background-color: var(--monokai-bg-lighter) !important;
+  color: var(--monokai-fg) !important;
+}
+
+/* Filas alternas - Aumentar especificidad */
+table.table-striped tbody tr:nth-of-type(odd),
+table.table-striped tbody tr:nth-of-type(odd) td,
+table.table-striped tbody tr:nth-of-type(odd) th,
+.table-striped > tbody > tr:nth-of-type(odd) > td,
+.table-striped > tbody > tr:nth-of-type(odd) > th {
+  background-color: var(--monokai-bg-light) !important;
+  color: var(--monokai-fg) !important;
+}
+
+table.table-striped tbody tr:nth-of-type(even),
+table.table-striped tbody tr:nth-of-type(even) td,
+table.table-striped tbody tr:nth-of-type(even) th,
+.table-striped > tbody > tr:nth-of-type(even) > td,
+.table-striped > tbody > tr:nth-of-type(even) > th {
+  background-color: var(--monokai-bg-lighter) !important;
+  color: var(--monokai-fg) !important;
+}
+
+/* Tablas responsivas */
+.table-responsive {
+  border-color: var(--monokai-border) !important;
+}
+
+/* Celdas de la cabecera */
+th {
+  color: var(--monokai-fg) !important;
+  background-color: var(--monokai-bg-lighter) !important;
+}
+
+/* Sobrescribir estilos de Bootstrap para tablas */
+.table > :not(:last-child) > :last-child > * {
+  border-bottom: none !important;
+}
+
+.table > :not(:first-child) {
+  border-top: none !important;
+}
+
+/* Para tablas con la clase table-dark */
+.table-dark,
+.table.table-dark {
+  --bs-table-bg: var(--monokai-bg-lighter) !important;
+  --bs-table-striped-bg: var(--monokai-bg-light) !important;
+  --bs-table-hover-bg: var(--monokai-bg) !important;
+  border: none !important;
+}
+
+/* Eliminar bordes de las celdas en tablas oscuras */
+.table-dark td,
+.table-dark th,
+.table.table-dark td,
+.table.table-dark th {
+  border: none !important;
+  border-bottom: 1px solid var(--monokai-bg) !important;
+}
+
+/* Eliminar bordes adicionales de Bootstrap */
+.table-bordered,
+.table-bordered td,
+.table-bordered th,
+.table-bordered thead th,
+.table-bordered thead td {
+  border: none !important;
+  border-bottom: 1px solid var(--monokai-bg-lighter) !important;
+}
+
+/* Eliminar bordes en tablas con hover */
+.table-hover tbody tr:hover td,
+.table-hover tbody tr:hover th {
+  background-color: var(--monokai-bg-lighter) !important;
+  border-color: transparent !important;
+}
+
+/* Para tablas con la clase table-light */
+.table-light {
+  --bs-table-bg: var(--monokai-bg-light) !important;
+  --bs-table-striped-bg: var(--monokai-bg-lighter) !important;
+  --bs-table-hover-bg: var(--monokai-bg-lighter) !important;
+}
+
+/* ===== BARRA DE NAVEGACIÓN ===== */
+.navbar,
+.navbar *,
+.navbar a:not(.btn),
+.navbar .nav-link,
+.navbar .nav-item,
+.navbar .dropdown-item,
+.navbar .text-muted,
+.navbar .text-body,
+.navbar .text-dark,
+.navbar .text-reset,
+.navbar .nav-pills .nav-link,
+.navbar .dropdown-toggle::after {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+.navbar {
+  background-color: var(--monokai-bg) !important;
+  border-bottom: 1px solid var(--monokai-bg-lighter) !important;
+}
+
+/* Asegurar que los enlaces y texto sean blancos */
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .navbar-text,
+.navbar .dropdown-item,
+.navbar .nav-item,
+.navbar .text-muted,
+.navbar .text-body,
+.navbar .text-dark,
+.navbar .text-reset {
+  color: #ffffff !important;
+}
+
+/* Efectos hover */
+.navbar .nav-link:hover,
+.navbar .nav-link:focus,
+.navbar .nav-link.active,
+.navbar .show > .nav-link,
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+  color: #ffffff !important;
+  opacity: 0.8;
+  background-color: transparent !important;
+}
+
+/* Dropdown en la barra de navegación */
+.navbar .dropdown-menu {
+  background-color: var(--monokai-bg-light) !important;
+  border: 1px solid var(--monokai-bg-lighter) !important;
+}
+
+.navbar .dropdown-item {
+  color: #ffffff !important;
+}
+
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+  background-color: var(--monokai-bg-lighter) !important;
+  color: #ffffff !important;
+  opacity: 1;
+}
+
+/* Iconos en la barra de navegación */
+.navbar .bi,
+.navbar .fas,
+.navbar .far,
+.navbar .fab,
+.navbar i[class^='fa-'],
+.navbar i[class*=' fa-'],
+.navbar .nav-link i,
+.navbar .nav-link:not(.btn) i,
+.app-header .navbar-nav .nav-link i,
+.app-header .navbar-nav .nav-link:hover i,
+.app-header .navbar-nav .nav-link:focus i,
+.app-header .navbar-nav .nav-link.active i {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Botón del menú móvil */
+.navbar-toggler {
+  border-color: rgba(var(--bs-white-rgb), 0.3) !important;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* Barra de búsqueda en el navbar */
+.navbar .form-control {
+  background-color: var(--monokai-bg-light) !important;
+  border-color: var(--monokai-bg-lighter) !important;
+  color: #ffffff !important;
+}
+
+.navbar .form-control::placeholder {
+  color: rgba(var(--bs-white-rgb), 0.6) !important;
+}
+
+.navbar .input-group-text {
+  background-color: var(--monokai-bg-lighter) !important;
+  border-color: var(--monokai-bg-lighter) !important;
+  color: #ffffff !important;
+}
+
+/* Alertas */
+.alert {
+  border: 1px solid transparent !important;
+  color: var(--monokai-fg) !important;
+}
+
+.alert-primary {
+  background-color: rgba(var(--bs-info-rgb), 0.1) !important;
+  border-color: var(--monokai-blue) !important;
+  color: var(--monokai-blue) !important;
+}
+
+.alert-success {
+  background-color: rgba(var(--bs-success-rgb), 0.1) !important;
+  border-color: var(--monokai-green) !important;
+  color: var(--monokai-green) !important;
+}
+
+.alert-danger {
+  background-color: rgba(var(--bs-danger-rgb), 0.1) !important;
+  border-color: var(--monokai-red) !important;
+  color: var(--monokai-red) !important;
+}
+
+.alert-warning {
+  background-color: rgba(var(--bs-warning-rgb), 0.1) !important;
+  border-color: var(--monokai-orange) !important;
+  color: var(--monokai-orange) !important;
+}
+
+/* Modales */
+.modal-content {
+  background-color: var(--monokai-bg-light) !important;
+}
+
+.modal-header,
+.modal-footer {
+  background-color: var(--monokai-bg-lighter) !important;
+  padding: 1rem;
+}
+
+/* Desplegables */
+.dropdown-menu {
+  background-color: var(--monokai-bg-light) !important;
+  padding: 0.5rem 0;
+}
+
+.dropdown-item {
+  color: var(--monokai-fg) !important;
+  padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--monokai-bg-lighter) !important;
+  color: var(--monokai-blue) !important;
+}
+
+/* Pestañas */
+.nav-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.nav-tabs .nav-link {
+  color: var(--monokai-fg) !important;
+  background-color: var(--monokai-bg-light) !important;
+  padding: 0.5rem 1rem;
+  border-radius: 0;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: var(--monokai-bg-lighter) !important;
+  color: var(--monokai-blue) !important;
+  font-weight: 600;
+}
+
+/* Scrollbar minimalista */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--monokai-bg-lighter);
+}
+
+/* Selección de texto */
+::selection {
+  background: var(--solwed-yellow);
+  color: #1e1e1e;
+}
+
+
+
+/* Estados de productos/facturas */
+.status-draft,
+.status-pending,
+.status-sent,
+.status-paid,
+.status-overdue,
+.status-partial,
+.status-approved,
+.status-rejected,
+.status-cancelled {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent !important;
+  transition: all var(--bs-transition-base);
+}
+
+/* Estado: Pagado */
+.status-paid,
+.status-paid:hover {
+  background-color: var(--bs-success) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: No pagado */
+.status-unpaid,
+.status-unpaid:hover {
+  background-color: var(--bs-danger) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: Pago parcial */
+.status-partial,
+.status-partial:hover {
+  background-color: var(--bs-warning) !important;
+  color: var(--bs-dark) !important;
+}
+
+/* Estado: Borrador */
+.status-draft,
+.status-draft:hover {
+  background-color: var(--bs-secondary) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: Cancelado */
+.status-cancelled,
+.status-cancelled:hover {
+  background-color: var(--bs-dark) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: Aprobado */
+.status-approved,
+.status-approved:hover {
+  background-color: var(--bs-primary) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: Pendiente */
+.status-pending,
+.status-pending:hover {
+  background-color: var(--bs-info) !important;
+  color: var(--bs-dark) !important;
+}
+
+/* Estado: Rechazado */
+.status-rejected,
+.status-rejected:hover {
+  background-color: var(--bs-danger-dark) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: Procesando */
+.status-processing,
+.status-processing:hover {
+  background-color: var(--bs-primary) !important;
+  color: var(--bs-white) !important;
+  animation: pulse 2s infinite;
+}
+
+/* Estado: Completado */
+.status-completed,
+.status-completed:hover {
+  background-color: var(--bs-success) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: Fallido */
+.status-failed,
+.status-failed:hover {
+  background-color: var(--bs-danger) !important;
+  color: var(--bs-white) !important;
+  text-decoration: line-through;
+}
+
+/* Estado: Reembolsado */
+.status-refunded,
+.status-refunded:hover {
+  background-color: var(--bs-purple) !important;
+  color: var(--bs-white) !important;
+}
+
+/* Estado: Vencido */
+.status-overdue,
+.status-overdue:hover {
+  background-color: var(--bs-orange) !important;
+  color: var(--bs-dark) !important;
+}
+
+/* Efecto hover para estados */
+[class^="status-"]:hover,
+[class*=" status-"]:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  text-decoration: none !important;
+}
+
+/* Asegurar que los colores se mantengan en enlaces */
+a[class^="status-"],
+a[class*=" status-"],
+a[class^="status-"]:hover,
+a[class*=" status-"]:hover {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* Ajustes para tablas */
+.table td [class^="status-"],
+.table td [class*=" status-"] {
+  display: inline-block;
+  min-width: 80px;
+  padding: 0.25rem 0.5rem;
+  text-align: center;
+  margin: 0.15rem 0;
+}
+
+/* Animación para estados de procesamiento */
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+/* Hover para elementos seleccionables */
+.nav-link:hover,
+.nav-link:focus,
+.accordion-button:hover,
+.accordion-button:focus {
+  background-color: var(--solwed-yellow-hover) !important;
+  color: var(--monokai-fg) !important;
+}
+
+/* Sidebar - Eliminar sombras y estilos no deseados */
+.left-sidebar {
+  background-color: var(--monokai-bg) !important;
+}
+
+
+/* Estilo para listas y enlaces del sidebar */
+.left-sidebar ul,
+.left-sidebar li {
+  color: var(--bs-white) !important;
+}
+
+.left-sidebar .sidebar-link {
+  color: var(--bs-white) !important;
+  transition: all var(--bs-transition-base) !important;
+}
+
+.left-sidebar .sidebar-link:hover,
+.left-sidebar .sidebar-link:focus {
+  background-color: transparent !important;
+  color: var(--bs-white) !important;
+  opacity: 0.8;
+}
+
+.left-sidebar .sidebar-link.active {
+  background-color: transparent !important;
+  color: var(--bs-white) !important;
+  font-weight: 600;
+}
+
+/* Sobrescribir estilos específicos del sidebar */
+.sidebar-nav ul .sidebar-item .first-level .sidebar-item .sidebar-link.active {
+  background-color: var(--solwed-yellow) !important;
+  color: var(--bs-white) !important;
+  font-weight: 600;
+}
+
+/* Asegurar que los iconos también sean blancos */
+.left-sidebar .sidebar-icon {
+  color: var(--bs-white) !important;
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  background-color: var(--monokai-bg) !important;
+  border-bottom: var(--bs-border-width) solid var(--monokai-bg-lighter) !important;
+  box-shadow: 0 2px 8px rgba(var(--bs-black-rgb), 0.3) !important;
+}
+
+.app-header .navbar {
+  background-color: transparent !important;
+}
+
+/* ===== MODO CLARO ===== */
+/* Los estilos del modo claro están en light-mode.css */
+
+/* ===== CLASES DE UTILIDAD ===== */
+.bg-light,
+.bg-white,
+.bg-body,
+.bg-body-tertiary {
+  background-color: var(--monokai-bg-light) !important;
+}
+
+.bg-body-secondary {
+  background-color: var(--monokai-bg-lighter) !important;
+}
+
+.text-dark {
+  color: var(--monokai-fg) !important;
+}
+
+.text-muted {
+  color: var(--monokai-comment) !important;
+}
+
+/* Eliminar bordes */
+.border,
+.border-top,
+.border-end,
+.border-bottom,
+.border-start,
+.border-0,
+.border-top-0,
+.border-end-0,
+.border-bottom-0,
+.border-start-0 {
+  border: none !important;
+}

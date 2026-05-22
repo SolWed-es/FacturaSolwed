@@ -1,0 +1,107 @@
+<div id="messages-toasts"
+     style="z-index: 9999; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);"></div>
+
+<script>
+    function setToast(message, style = 'info', title = '', time = 10000) {
+        let icon = '';
+        let styleBorder = '';
+        let styleHeader = '';
+        let role = 'status';
+        let live = 'polite';
+        let delay = time > 0 ? 'data-delay="' + time + '"' : 'data-autohide="false"';
+
+        switch (style) {
+            case 'completed':
+                styleHeader = 'bg-success text-white';
+                styleBorder = 'border border-success';
+                icon = '<i class="fa-solid fa-check-circle me-1"></i>';
+                title = title !== '' ? title : '{{ trans('completed') }}';
+                break;
+
+            case 'critical':
+            case 'error':
+            case 'danger':
+                role = 'alert';
+                live = 'assertive';
+                styleHeader = 'bg-danger text-white';
+                styleBorder = 'border border-danger';
+                icon = '<i class="fa-solid fa-times-circle me-1"></i>';
+                title = title !== '' ? title : '{{ trans('common-error') }}';
+                break;
+
+            case 'info':
+                styleHeader = 'bg-info text-white';
+                styleBorder = 'border border-info';
+                icon = '<i class="fa-solid fa-info-circle me-1"></i>';
+                title = title !== '' ? title : '{{ trans('info') }}';
+                break;
+
+            case 'spinner':
+                styleHeader = 'bg-info text-white';
+                styleBorder = 'border border-info';
+                icon = '<i class="fa-solid fa-circle-notch fa-spin me-1"></i>';
+                title = title !== '' ? title : '{{ trans('processing') }}';
+                break;
+
+            case 'notice':
+            case 'success':
+                styleHeader = 'bg-success text-white';
+                styleBorder = 'border border-success';
+                icon = '<i class="fa-solid fa-check-circle me-1"></i>';
+                title = title !== '' ? title : '{{ trans('success') }}';
+                break;
+
+            case 'warning':
+                styleHeader = 'bg-warning';
+                styleBorder = 'border border-warning';
+                icon = '<i class="fa-solid fa-exclamation-circle me-1"></i>';
+                title = title !== '' ? title : '{{ trans('warning') }}';
+                break;
+        }
+
+        // Crear estructura del toast
+        const container = document.getElementById('messages-toasts');
+
+        container.querySelectorAll('.toast.hide').forEach(t => t.remove());
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${style} ${styleBorder} ${delay}`;
+        toast.setAttribute('role', role);
+        toast.setAttribute('aria-live', live);
+        toast.setAttribute('aria-atomic', 'true');
+        toast.style.margin = '15px auto 0 auto';
+
+        const header = document.createElement('div');
+        header.className = `toast-header ${styleHeader}${message === '' ? ' border-bottom-0' : ''}`;
+
+        const strong = document.createElement('strong');
+        strong.className = 'me-auto';
+        strong.innerHTML = `${icon}${title}`;
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = `btn-close ms-2${styleHeader.includes('text-white') ? ' btn-close-white' : ''}`;
+        closeBtn.setAttribute('data-bs-dismiss', 'toast');
+        closeBtn.setAttribute('aria-label', "{{ trans('close') }}");
+
+        header.appendChild(strong);
+        header.appendChild(closeBtn);
+        toast.appendChild(header);
+
+        if (message !== '') {
+            const body = document.createElement('div');
+            body.className = 'toast-body';
+            body.innerHTML = message;
+            toast.appendChild(body);
+        }
+
+        container.appendChild(toast);
+
+        const autohide = time > 0;
+        const toastObj = new bootstrap.Toast(toast, {delay: time, autohide});
+
+        toast.addEventListener('hidden.bs.toast', () => toast.remove());
+
+        toastObj.show();
+    }
+</script>

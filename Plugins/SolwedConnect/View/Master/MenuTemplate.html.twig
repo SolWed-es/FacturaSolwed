@@ -1,0 +1,182 @@
+{#
+/**
+ * This file is part of FacturaScripts
+ * Copyright (C) 2017-2024 Carlos Garcia Gomez <carlos@facturascripts.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ */
+#}
+{% import 'Macro/GoogleTagManager.html.twig' as GoogleTagManager %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ constant('FS_LANG') | slice(0, 2) }}"
+      xml:lang="{{ constant('FS_LANG') | slice(0, 2) }}">
+<head>
+    {{ GoogleTagManager.head() }}
+    {% for includeView in getIncludeViews('MenuTemplate', 'HeadFirst') %}
+        {% include includeView['path'] %}
+    {% endfor %}
+    {% block meta %}
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>{{ fsc.title | raw }}</title>
+        <meta name="description" content="{{ trans('meta-description') }}"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="generator" content="FacturaScripts"/>
+        <meta name="robots" content="noindex"/>
+    {% endblock %}
+    {% block icons %}
+        <link rel="shortcut icon" href="{{ asset('Dinamic/Assets/Images/favicon.ico') }}"/>
+        <link rel="apple-touch-icon" sizes="180x180"
+              href="{{ asset('Dinamic/Assets/Images/apple-icon-180x180.png') }}"/>
+    {% endblock %}
+    {% for includeView in getIncludeViews('MenuTemplate', 'CssBefore') %}
+        {% include includeView['path'] %}
+    {% endfor %}
+    {% block css %}
+        <link rel="stylesheet" href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}"/>
+        <link rel="stylesheet" href="{{ asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css') }}"/>
+        <!-- Solwed Theme -->
+        <link rel="stylesheet" href="{{ asset('Plugins/SolwedConnect/Assets/CSS/styles.min.css') }}"/>
+        <link rel="stylesheet" href="{{ asset('Plugins/SolwedConnect/Assets/CSS/flexy.min.css') }}" />
+    {% endblock %}
+    
+    <!-- Custom CSS (se carga al final para sobrescribir estilos) -->
+    <link rel="stylesheet" href="{{ asset('Plugins/SolwedConnect/Assets/CSS/custom.css') }}?v={{ 'now'|date('YmdHis') }}" />
+    {# Adds custom CSS assets #}
+    {% for css in assetManager.get('css') %}
+        <link rel="stylesheet" href="{{ css }}"/>
+    {% endfor %}
+    {% for includeView in getIncludeViews('MenuTemplate', 'CssAfter') %}
+        {% include includeView['path'] %}
+    {% endfor %}
+    
+    <!-- Tema oscuro (se carga al final para sobrescribir todos los estilos) -->
+    <link id="dark-theme" rel="stylesheet" href="{{ asset('Plugins/SolwedConnect/Assets/CSS/dark-theme.css') }}" media="none">
+    {% for includeView in getIncludeViews('MenuTemplate', 'JsHeadBefore') %}
+        {% include includeView['path'] %}
+    {% endfor %}
+    {% block javascripts %}
+        <script src="{{ asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
+        <script src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ asset('node_modules/pace-js/pace.min.js') }}"></script>
+        {# <script src="{{ asset('node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}"></script> #}
+        <script src="{{ asset('Dinamic/Assets/JS/Custom.js') }}?v=6"></script>
+
+        <!-- Solwed Theme -->
+        <script src="{{ asset('Plugins/SolwedConnect/Assets/JS/sidebarmenu.js') }}"></script>
+        <script src="{{ asset('Plugins/SolwedConnect/Assets/JS/app.min.js') }}"></script>
+        <script src="{{ asset('Plugins/SolwedConnect/Assets/libs/simplebar/dist/simplebar.js') }}"></script>
+        <script src="{{ asset('Plugins/SolwedConnect/Assets/JS/FlexyTheme.js') }}"></script>
+    {% endblock %}
+    {# Adds custom JS assets #}
+    {% for js in assetManager.get('js') %}
+        <script src="{{ js }}"></script>
+    {% endfor %}
+    {% for includeView in getIncludeViews('MenuTemplate', 'JsHeadAfter') %}
+        {% include includeView['path'] %}
+    {% endfor %}
+    {% if debugBarRender %}
+        {{ debugBarRender.renderHead() | raw }}
+    {% endif %}
+    {% for includeView in getIncludeViews('MenuTemplate', 'HeadEnd') %}
+        {% include includeView['path'] %}
+    {% endfor %}
+</head>
+{% block fullBody %}
+    <body>
+    <!--  Body Wrapper -->
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-sidebartype="full">
+        {{ GoogleTagManager.body() }}
+        {% for includeView in getIncludeViews('MenuTemplate', 'BodyFirst') %}
+            {% include includeView['path'] %}
+        {% endfor %}
+        {% block navbar %}
+            <!-- Sidebar Start -->
+            <aside class="left-sidebar with-vertical bg-dark text-white">
+                <!-- Sidebar scroll-->
+                <div>
+                    <div class="brand-logo d-flex justify-content-between align-items-center p-3">
+                        <div class="d-xl-none d-block">
+                            <!-- Puedes poner algo aquí si quieres que haya algo a la izquierda en móvil -->
+                        </div>
+
+                        <a class="d-flex align-items-center mx-auto" href="{{ asset(fsc.user.homepage) }}"
+                           title="{{ trans('homepage') }}">
+                            <img src="{{ asset('Dinamic/Assets/Images/logo-white.png') }}" width="64" height="64"
+                                 class="d-inline-block align-top" alt="FacturaScripts">
+                        </a>
+
+                        <div class="text-white close-btn d-xl-none d-block sidebartoggler cursor-pointer"
+                             id="sidebarCollapse">
+                            <i class="fa-solid fa-xmark"></i>
+                        </div>
+                    </div>
+                    <!-- Sidebar navigation-->
+                    <nav class="sidebar-nav scroll-sidebar" style="height: calc(100vh - 120px);"
+                         data-simplebar="">
+                        <ul id="sidebarnav">
+                            {% import 'Macro/Menu.html.twig' as macros %}
+                            {% for menuItem in menuManager.getMenu() %}
+                                {{ macros.showMenu(menuItem) }}
+                            {% endfor %}
+                            {% block navbarMenuIcon %}
+                            {% endblock %}
+                        </ul>
+                    </nav>
+                    <!-- End Sidebar navigation -->
+                </div>
+                <!-- End Sidebar scroll-->
+            </aside>
+            <!-- Sidebar End -->
+        {% endblock %}
+        <div class="body-wrapper">
+            <!--  Header Start -->
+            {% include 'Master/AppHeader.html.twig' %}
+            <!--  Header End -->
+            <div class="pt-4">
+                {% block messages %}
+                    {% include 'Macro/Toasts.html.twig' %}
+                    {% from 'Macro/Utils.html.twig' import message as showMessage %}
+
+                    {{ showMessage(log, ['error', 'critical'], 'danger') }}
+                    {{ showMessage(log, ['warning'], 'warning') }}
+                    {{ showMessage(log, ['notice'], 'success') }}
+                    {{ showMessage(log, ['info'], 'info') }}
+
+                {% endblock %}
+                {% block bodyHeaderOptions %}
+                {% endblock %}
+            </div>
+            {% block body %}
+            {% endblock %}
+        </div>
+        {% for includeView in getIncludeViews('MenuTemplate', 'JsFooter') %}
+            {% include includeView['path'] %}
+        {% endfor %}
+        {% for includeView in getIncludeViews('MenuTemplate', 'BodyEnd') %}
+            {% include includeView['path'] %}
+        {% endfor %}
+        {% if debugBarRender %}
+            {{ debugBarRender.render() | raw }}
+        {% endif %}
+        <br/>
+        <br/>
+        <!-- execution time: {{ executionTime() }} s -->
+    </div>
+    <script>
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    </script>
+    </body>
+{% endblock %}
+</html>

@@ -1,0 +1,74 @@
+{#
+    /**
+     * This file is part of FacturaScripts
+     * Copyright (C) 2017-2019 Carlos Garcia Gomez <carlos@facturascripts.com>
+     *
+     * This program is free software: you can redistribute it and/or modify
+     * it under the terms of the GNU Lesser General Public License as
+     * published by the Free Software Foundation, either version 3 of the
+     * License, or (at your option) any later version.
+     *
+     * This program is distributed in the hope that it will be useful,
+     * but WITHOUT ANY WARRANTY; without even the implied warranty of
+     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+     * GNU Lesser General Public License for more details.
+     *
+     * You should have received a copy of the GNU Lesser General Public License
+     * along with this program. If not, see <http://www.gnu.org/licenses/>.
+     */
+#}
+
+{% macro showMenu(menuItem, parent) %}
+    {% import _self as macros %}
+    {% set active = menuItem.active ? ' active' : '' %}
+    {% set menuId = parent is empty ? 'menu-' ~ menuItem.title|lower|replace({' ': '-'}) : parent ~ '-' ~ menuItem.name|lower %}
+
+    {% if parent is empty %}
+        <li class="sidebar-item">
+            <a class="sidebar-link justify-content-between{% if menuItem.menu is not empty %} has-arrow{% endif %}"
+               href="{{ menuItem.menu is empty ? menuItem.url : 'javascript:void(0)' }}"
+               aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="d-flex">
+                        {#<i class="{{ menuItem.icon|default('ti ti-circle') }}"></i>#}
+                        <i class="fa-regular fa-folder-closed fa-fw"></i>
+                    </span>
+                    <span class="hide-menu">{{ menuItem.title }}</span>
+                </div>
+            </a>
+
+            {% if menuItem.menu is not empty %}
+            <ul aria-expanded="false" class="collapse first-level">
+                {% for item in menuItem.menu %}
+                    {% if item.menu is empty %}
+                    <li class="sidebar-item" style="padding-left: 15px;">
+                        <a class="sidebar-link justify-content-between" href="{{ item.url }}">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="round-16 d-flex align-items-center justify-content-center">
+                                    <i class="{{ item.icon }} menu-icon"></i>
+                                </div>
+                                <span class="hide-menu menu-title">{{ item.title }}</span>
+                            </div>
+                        </a>
+                    </li>
+                    {% else %}
+                        {{ macros.showMenu(item, menuId) }}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+        </li>
+    {% else %}
+        <li class="sidebar-item">
+            <a class="sidebar-link justify-content-between" href="{{ menuItem.url }}">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="{{ menuItem.icon|default('ti ti-circle') }}"></i>
+                    </div>
+                    <span class="hide-menu">{{ menuItem.title }}</span>
+                </div>
+            </a>
+        </li>
+    {% endif %}
+{% endmacro %}

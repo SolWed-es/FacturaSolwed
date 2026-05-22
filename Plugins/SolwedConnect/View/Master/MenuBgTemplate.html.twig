@@ -21,7 +21,7 @@
 {% extends "Master/MenuTemplate.html.twig" %}
 
 {% block fullBody %}
-    <body>
+    <body class="bg-light">
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-sidebartype="full">
         {{ GoogleTagManager.body() }}
         {% block navbar %}
@@ -41,18 +41,18 @@
                 {% block body %}
                     {{ parent() }}
                 {% endblock %}
-                <br/>
-                <br/>
+                <br>
+                <br>
             </div>
+            {% for includeView in getIncludeViews('MenuTemplate', 'JsFooter') %}
+                {% include includeView['path'] %}
+            {% endfor %}
+            {% for includeView in getIncludeViews('MenuTemplate', 'BodyEnd') %}
+                {% include includeView['path'] %}
+            {% endfor %}
+            {{ debugBarRender.render() | raw }}
+            <!-- execution time: {{ executionTime() }} s -->
         </div>
-        {% for includeView in getIncludeViews('MenuTemplate', 'JsFooter') %}
-            {% include includeView['path'] %}
-        {% endfor %}
-        {% for includeView in getIncludeViews('MenuTemplate', 'BodyEnd') %}
-            {% include includeView['path'] %}
-        {% endfor %}
-        {{ debugBarRender.render() | raw }}
-        <!-- execution time: {{ executionTime() }} s -->
     </div>
     </body>
 {% endblock %}
