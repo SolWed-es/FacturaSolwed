@@ -180,6 +180,13 @@ class LicenseClient
                 return $status;
             }
 
+            // 404 = token no existe en la DB → rechazo explícito, no es offline
+            if ($response->status() === 404) {
+                $status = self::unlicensed('token_invalido');
+                Cache::set(self::CACHE_KEY, $status);
+                return $status;
+            }
+
             if (in_array($response->status(), [401, 403], true)) {
                 $body   = $response->json() ?? [];
                 $status = self::unlicensed($body['reason'] ?? 'sin_suscripcion');
@@ -187,10 +194,10 @@ class LicenseClient
                 return $status;
             }
         } catch (\Exception $e) {
-            // sin conexión — caer al bloque de gracia
+            // sin conexión — caer al bloque offline
         }
 
-        // BUG FIX: gracia SOLO si hubo una verificación exitosa previa
+        // Gracia si hubo verificación exitosa previa
         $grace = Cache::get(self::CACHE_KEY . '_grace');
         if (!empty($grace) && self::isFresh($grace, self::GRACE_TTL)) {
             $grace['grace'] = true;
@@ -198,8 +205,22 @@ class LicenseClient
             return $grace;
         }
 
-        // Sin verificación previa + sin conexión → no conceder acceso
-        return self::unlicensed('sin_conexion');
+        // Sin conexión (ni previa ni ahora) → funciona con plan mínimo.
+        // El token es válido localmente; la API de gestión remota requiere
+        // internet de todas formas, así que no se pierde control.
+        $offline = [
+            'active'      => true,
+            'plan'        => 'none',
+            'type'        => self::getType(),
+            'features'    => [],
+            'expires_at'  => null,
+            'dias_restantes' => null,
+            'checked_at'  => time(),
+            'offline'     => true,
+            'reason'      => 'offline',
+        ];
+        Cache::set(self::CACHE_KEY, $offline);
+        return $offline;
     }
 
     /** Comprueba si un status cacheado sigue siendo válido según su TTL */
