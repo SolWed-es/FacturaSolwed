@@ -1,6 +1,7 @@
 <?php
 namespace FacturaScripts\Plugins\SolwedConnect;
 
+use FacturaScripts\Core\Cache;
 use FacturaScripts\Core\Kernel;
 use FacturaScripts\Core\Plugins;
 use FacturaScripts\Core\Template\CronClass;
@@ -13,11 +14,12 @@ class Cron extends CronClass
 {
     public function run(): void
     {
-        // heartbeat cada 15 minutos — Mind detecta instancias caídas
+        // heartbeat cada 15 minutos — Mind detecta instancias caídas y devuelve notificaciones
         $this->job('solwedconnect-heartbeat')
             ->every('15 minutes')
             ->run(function () {
-                MindClient::sendHeartbeat((string) Kernel::version());
+                $notifications = MindClient::sendHeartbeat((string) Kernel::version());
+                Cache::set('solwedconnect_notifications', $notifications);
             });
 
         // telemetría cada 6 horas

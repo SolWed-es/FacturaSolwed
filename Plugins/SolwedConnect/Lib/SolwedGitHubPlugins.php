@@ -11,14 +11,14 @@ use FacturaScripts\Core\Tools;
  * URL resuelta en este orden:
  *   1. Env var SOLWED_PLUGIN_STORE_URL  (Docker managed)
  *   2. AppSettings solwedconnect.plugin_store_url
- *   3. GitHub SolWed-es/SolwedPlugins-container (fallback público)
+ *   3. https://plugins.erpsolwed.es     (default producción)
  *
  * Reemplaza Forja::plugins() en AdminPlugins.
  */
 class SolwedGitHubPlugins
 {
-    const CACHE_KEY = 'solwed_plugin_list';
-    const JSON_URL_GITHUB = 'https://raw.githubusercontent.com/SolWed-es/SolwedPlugins-container/main/plugin-list.json';
+    const CACHE_KEY  = 'solwed_plugin_list';
+    const STORE_URL  = 'https://plugins.erpsolwed.es';
 
     public static function getStoreBaseUrl(): string
     {
@@ -30,17 +30,7 @@ class SolwedGitHubPlugins
         if (!empty($settings)) {
             return rtrim($settings, '/');
         }
-        return 'https://raw.githubusercontent.com/SolWed-es/SolwedPlugins-container/main';
-    }
-
-    private static function getCatalogUrl(): string
-    {
-        $base = self::getStoreBaseUrl();
-        // GitHub raw URLs ya incluyen el fichero, los demás no
-        if (str_contains($base, 'githubusercontent.com')) {
-            return self::JSON_URL_GITHUB;
-        }
-        return $base . '/plugin-list.json';
+        return self::STORE_URL;
     }
 
     public static function getPluginMap(): array
@@ -61,18 +51,12 @@ class SolwedGitHubPlugins
 
     public static function getDownloadUrl(string $name): string
     {
-        // Primero buscar en el catálogo
         foreach (self::fetchPlugins() as $plugin) {
             if ($plugin['name'] === $name && !empty($plugin['download_url'])) {
                 return $plugin['download_url'];
             }
         }
-        // Fallback: construir desde base URL
-        $base = self::getStoreBaseUrl();
-        if (str_contains($base, 'githubusercontent.com')) {
-            return 'https://github.com/SolWed-es/SolwedPlugins-container/raw/main/zip/' . $name . '.zip';
-        }
-        return $base . '/zip/' . $name . '.zip';
+        return self::getStoreBaseUrl() . '/zip/' . $name . '.zip';
     }
 
     public static function clearCache(): void
@@ -83,22 +67,27 @@ class SolwedGitHubPlugins
     private static function fetchPlugins(): array
     {
         return Cache::remember(self::CACHE_KEY, function () {
-            $url = self::getCatalogUrl();
+            $url = self::getStoreBaseUrl() . '/plugin-list.json';
             $response = Http::get($url)
                 ->setTimeout(10)
                 ->setHeader('User-Agent', 'FacturaSolwed/1.0');
+
             if ($response->failed()) {
                 return [];
             }
+
             $data = json_decode($response->body(), true);
-            if (is_array($data) && isset($data['plugins'])) {
-                return $data['plugins'];
+            if (!is_array($data)) {
+                return [];
             }
-            // Formato array directo (GitHub container)
-            if (is_array($data)) {
-                return $data;
-            }
-            return [];
+
+            // Soporta tanto {plugins: [...]} como array directo
+            $list = isset($data['plugins']) && is_array($data['plugins'])
+                ? $data['plugins']
+                : $data;
+
+            // Filtrar entradas sin nombre
+            return array_values(array_filter($list, fn($p) => !empty($p['name'])));
         });
     }
 }

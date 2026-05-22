@@ -92,6 +92,14 @@ class LicenseClient
         Cache::delete(self::CACHE_KEY . '_grace');
     }
 
+    public static function revoke(): void
+    {
+        Tools::settingsSet('solwedconnect', 'mind_token', '');
+        Tools::settingsSet('solwedconnect', 'instalacion_id', '');
+        Tools::settingsSave();
+        self::clearCache();
+    }
+
     // ── Activación self-hosted ────────────────────────────────────────────────
 
     public static function activate(string $code, string $url, string $nombre): array

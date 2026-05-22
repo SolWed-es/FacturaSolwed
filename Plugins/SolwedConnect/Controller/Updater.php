@@ -5,17 +5,15 @@ use FacturaScripts\Core\Http;
 use FacturaScripts\Core\Internal\Plugin;
 use FacturaScripts\Core\Kernel;
 use FacturaScripts\Core\Plugins;
-use FacturaScripts\Core\Response;
 use FacturaScripts\Core\Tools;
-use FacturaScripts\Dinamic\Model\User;
 use FacturaScripts\Plugins\SolwedConnect\Lib\SolwedGitHub;
 use FacturaScripts\Plugins\SolwedConnect\Lib\SolwedGitHubPlugins;
 
 /**
  * Sobreescribe Updater de NeoRazorX:
  * - Elimina Forja, Telemetry y UPDATE_CORE_URL de facturascripts.com
- * - Usa SolwedGitHub para detectar actualizaciones del core
- * - Usa SolwedGitHubPlugins para plugins del catálogo Solwed
+ * - Core updates via Mind proxy (SolwedGitHub)
+ * - Plugin updates via catálogo propio plugins.erpsolwed.es (SolwedGitHubPlugins)
  */
 class Updater extends \FacturaScripts\Core\Controller\Updater
 {
@@ -57,7 +55,7 @@ class Updater extends \FacturaScripts\Core\Controller\Updater
             }
         }
 
-        // plugin updates via SolwedGitHub (plugins con campo github en su ini)
+        // plugin updates via catálogo Solwed (plugins.erpsolwed.es)
         foreach (Plugins::list() as $plugin) {
             if (!$plugin->enabled) {
                 continue;
@@ -125,20 +123,15 @@ class Updater extends \FacturaScripts\Core\Controller\Updater
 
     private static function getSolwedPluginUpdate(Plugin $plugin): array
     {
-        $iniPath = $plugin->folder() . DIRECTORY_SEPARATOR . 'facturascripts.ini';
-        if (!file_exists($iniPath)) {
-            return [];
-        }
-        $ini = parse_ini_file($iniPath);
-        $github = trim($ini['github'] ?? '');
-        if (empty($github)) {
+        $catalog = SolwedGitHubPlugins::getPluginMap();
+        $entry   = $catalog[$plugin->name] ?? [];
+
+        if (empty($entry) || empty($entry['download_url'])) {
             return [];
         }
 
-        [$repo, $pluginName] = array_pad(explode(':', $github, 2), 2, $plugin->name);
-        $build = SolwedGitHub::getPluginBuild($repo, $pluginName);
-        // BUG FIX: version_compare en lugar de <= para evitar pérdida de precisión con floats
-        if (empty($build) || version_compare((string)$build['version'], (string)$plugin->version, '<=')) {
+        $catalogVersion = (string)($entry['version'] ?? '0');
+        if (version_compare($catalogVersion, (string)$plugin->version, '<=')) {
             return [];
         }
 
@@ -146,17 +139,17 @@ class Updater extends \FacturaScripts\Core\Controller\Updater
         return [
             'description' => Tools::trans('plugin-update', [
                 '%pluginName%' => $plugin->name,
-                '%version%' => $build['version'],
+                '%version%'    => $catalogVersion,
             ]),
             'downloaded' => file_exists(Tools::folder($fileName)),
-            'filename' => $fileName,
-            'id' => $plugin->name,
-            'name' => $plugin->name,
-            'stable' => $build['stable'],
-            'url' => $build['url'],
-            'version' => $build['version'],
-            'mincore' => 0,
-            'maxcore' => 0,
+            'filename'   => $fileName,
+            'id'         => $plugin->name,
+            'name'       => $plugin->name,
+            'stable'     => true,
+            'url'        => $entry['download_url'],
+            'version'    => $catalogVersion,
+            'mincore'    => 0,
+            'maxcore'    => 0,
         ];
     }
 }
