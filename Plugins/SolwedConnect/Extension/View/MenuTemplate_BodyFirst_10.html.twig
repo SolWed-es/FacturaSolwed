@@ -1,0 +1,45 @@
+{# SolwedConnect — layout sidebar + header. Oculta navbar Bootstrap con CSS #}
+<style>
+    /* Ocultar navbar Bootstrap original */
+    .navbar { display: none !important; }
+    /* Ajustar main content para sidebar */
+    body { display: flex; min-height: 100vh; overflow-x: hidden; }
+    .solwed-main { flex: 1; margin-left: 16rem; display: flex; flex-direction: column; min-width: 0; transition: margin-left 0.2s; }
+    .solwed-sidebar.collapsed ~ .solwed-main,
+    body:has(.solwed-sidebar.collapsed) .solwed-main { margin-left: 0; }
+    @media (max-width: 767px) {
+        .solwed-main { margin-left: 0; }
+        .solwed-sidebar { display: none; }
+        body:has(.solwed-sidebar:not(.collapsed)) .solwed-main { margin-left: 0; }
+    }
+</style>
+
+{# Sidebar #}
+<nav class="solwed-sidebar d-print-none" id="solwedSidebar">
+    <div class="sidebar-brand">
+        <a href="{{ asset(fsc.user.homepage) }}">
+            <img src="{{ asset('Dinamic/Assets/Images/horizontal-logo.png') }}"
+                 class="sidebar-brand-logo"
+                 alt="{{ fsc.empresa.nombrecorto | raw }}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="sidebar-brand-name" style="display:none">{{ fsc.empresa.nombrecorto | raw }}</span>
+        </a>
+    </div>
+    <div class="sidebar-nav">
+        {% import 'Macro/Menu.html.twig' as macros %}
+        {% for menuItem in menuManager.getMenu() %}
+            {{ macros.showMenu(menuItem) }}
+        {% endfor %}
+    </div>
+    <div class="sidebar-powered">
+        <a href="https://solwed.es" target="_blank" rel="noopener">
+            <img src="{{ asset('Dinamic/Assets/Images/logo.png') }}" class="sidebar-powered-logo" alt="Solwed">
+            Powered by Solwed
+        </a>
+    </div>
+</nav>
+
+{# Wrapper main #}
+<div class="solwed-main">
+    {# Header #}
+    {% include '@PluginSolwedConnect/Master/AppHeader.html.twig' %}
