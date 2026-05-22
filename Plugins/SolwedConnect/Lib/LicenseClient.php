@@ -6,22 +6,18 @@ use FacturaScripts\Core\Http;
 use FacturaScripts\Core\Tools;
 
 /**
- * Verifica licencia/suscripción con w-api (app.solwed.es).
+ * Verifica licencia/suscripción con w-api (api.solwed.es).
  *
- * Endpoints:
- *   GET  /fs/license?token=<mind_token>   → estado de suscripción
- *   POST /fs/activate                     → activar instalación self-hosted
- *
- * Cache 24h. 72h de gracia sin conexión.
+ * Cache: Cache::set() no soporta TTL — usamos FileCache de FS que expira automáticamente.
+ * El TTL se gestiona manualmente guardando el timestamp en el propio array.
  */
 class LicenseClient
 {
     const CACHE_KEY  = 'solwedconnect_license';
-    const CACHE_TTL  = 86400;    // 24h
-    const GRACE_TTL  = 259200;   // 72h
+    const CACHE_TTL  = 86400;    // 24h en segundos
+    const GRACE_TTL  = 259200;   // 72h en segundos
     const BASE_URL   = 'https://api.solwed.es';
 
-    // Features por plan (mirror del catálogo de w-api)
     const FEATURES = [
         'principiante' => [
             'facturacion_electronica', 'verifactu', 'presupuestos', 'albaranes',
@@ -50,8 +46,9 @@ class LicenseClient
 
     public static function getStatus(): array
     {
+        // Comprobar cache (con TTL manual)
         $cached = Cache::get(self::CACHE_KEY);
-        if (!empty($cached)) {
+        if (!empty($cached) && self::isFresh($cached, self::CACHE_TTL)) {
             return $cached;
         }
 
@@ -65,12 +62,12 @@ class LicenseClient
 
     public static function isActive(): bool
     {
-        return self::getStatus()['active'] ?? false;
+        return (bool)((self::getStatus())['active'] ?? false);
     }
 
     public static function getPlan(): string
     {
-        return self::getStatus()['plan'] ?? 'none';
+        return (string)((self::getStatus())['plan'] ?? 'none');
     }
 
     public static function getType(): string
@@ -86,20 +83,17 @@ class LicenseClient
     public static function hasFeature(string $feature): bool
     {
         $plan = self::getPlan();
-        return in_array($feature, self::FEATURES[$plan] ?? []);
+        return in_array($feature, self::FEATURES[$plan] ?? [], true);
     }
 
     public static function clearCache(): void
     {
         Cache::delete(self::CACHE_KEY);
+        Cache::delete(self::CACHE_KEY . '_grace');
     }
 
-    // ── Activación self-hosted ─────────────────────────────────────────────────
+    // ── Activación self-hosted ────────────────────────────────────────────────
 
-    /**
-     * Activa una instalación self-hosted con código de un solo uso.
-     * Devuelve ['ok' => true, 'mind_token' => '...'] o ['ok' => false, 'error' => '...']
-     */
     public static function activate(string $code, string $url, string $nombre): array
     {
         try {
@@ -112,9 +106,8 @@ class LicenseClient
             if ($response->status() === 200) {
                 $data = $response->json() ?? [];
                 if (!empty($data['mind_token'])) {
-                    // guardar token en settings
                     Tools::settingsSet('solwedconnect', 'mind_token', $data['mind_token']);
-                    Tools::settingsSet('solwedconnect', 'instalacion_id', $data['instalacion_id'] ?? '');
+                    Tools::settingsSet('solwedconnect', 'instalacion_id', (string)($data['instalacion_id'] ?? ''));
                     Tools::settingsSave();
                     self::clearCache();
                     return ['ok' => true, 'mind_token' => $data['mind_token']];
@@ -128,31 +121,25 @@ class LicenseClient
         }
     }
 
-    // ── Webhook entrante ───────────────────────────────────────────────────────
+    // ── Webhook entrante ──────────────────────────────────────────────────────
 
-    /**
-     * Procesa notificación en tiempo real de cambio de suscripción.
-     * Llamado desde Controller/SolwedWebhook.php
-     */
     public static function processWebhook(array $payload): void
     {
         $status = $payload['status'] ?? '';
-        $plan = $payload['producto'] ?? '';
-
-        // limpiar "erp-" del nombre del producto si lo trae
-        $plan = str_replace('erp-', '', $plan);
+        $plan   = str_replace('erp-', '', $payload['producto'] ?? '');
 
         $newStatus = [
-            'active' => in_array($status, ['active', 'trialing']),
-            'plan' => $plan,
-            'type' => self::getType(),
-            'features' => self::FEATURES[$plan] ?? [],
+            'active'     => in_array($status, ['active', 'trialing'], true),
+            'plan'       => $plan,
+            'type'       => self::getType(),
+            'features'   => self::FEATURES[$plan] ?? [],
             'expires_at' => $payload['expires_at'] ?? null,
             'checked_at' => time(),
-            'reason' => $status !== 'active' ? $status : null,
+            'reason'     => ($status !== 'active') ? $status : null,
         ];
 
-        Cache::set(self::CACHE_KEY, $newStatus, self::CACHE_TTL);
+        // BUG FIX: Cache::set() no acepta TTL — guardamos timestamp para TTL manual
+        Cache::set(self::CACHE_KEY, $newStatus);
     }
 
     // ── Privado ───────────────────────────────────────────────────────────────
@@ -165,68 +152,63 @@ class LicenseClient
 
             if ($response->status() === 200) {
                 $data = $response->json() ?? [];
-                $plan = $data['plan'] ?? 'none';
+                $plan = (string)($data['plan'] ?? 'none');
                 $status = [
-                    'active' => (bool)($data['active'] ?? false),
-                    'plan' => $plan,
-                    'type' => self::getType(),
-                    'features' => $data['features'] ?? self::FEATURES[$plan] ?? [],
-                    'expires_at' => $data['expires_at'] ?? null,
-                    'dias_restantes' => $data['dias_restantes'] ?? null,
-                    'instalacion_id' => $data['instalacion_id'] ?? null,
-                    'instalacion_nombre' => $data['instalacion_nombre'] ?? null,
-                    'checked_at' => time(),
+                    'active'              => (bool)($data['active'] ?? false),
+                    'plan'                => $plan,
+                    'type'                => self::getType(),
+                    'features'            => $data['features'] ?? self::FEATURES[$plan] ?? [],
+                    'expires_at'          => $data['expires_at'] ?? null,
+                    'dias_restantes'      => $data['dias_restantes'] ?? null,
+                    'instalacion_id'      => $data['instalacion_id'] ?? null,
+                    'instalacion_nombre'  => $data['instalacion_nombre'] ?? null,
+                    'checked_at'          => time(),
                 ];
-                Cache::set(self::CACHE_KEY, $status, self::CACHE_TTL);
-                // guardar también como gracia para periodos sin conexión
-                Cache::set(self::CACHE_KEY . '_grace', $status, self::GRACE_TTL);
+                // BUG FIX: sin TTL — gestionado con checked_at
+                Cache::set(self::CACHE_KEY, $status);
+                Cache::set(self::CACHE_KEY . '_grace', $status);
                 return $status;
             }
 
-            if (in_array($response->status(), [401, 403])) {
-                $body = $response->json() ?? [];
+            if (in_array($response->status(), [401, 403], true)) {
+                $body   = $response->json() ?? [];
                 $status = self::unlicensed($body['reason'] ?? 'sin_suscripcion');
-                Cache::set(self::CACHE_KEY, $status, self::CACHE_TTL);
+                Cache::set(self::CACHE_KEY, $status);
                 return $status;
             }
         } catch (\Exception $e) {
-            // sin conexión
+            // sin conexión — caer al bloque de gracia
         }
 
-        // periodo de gracia
+        // BUG FIX: gracia SOLO si hubo una verificación exitosa previa
         $grace = Cache::get(self::CACHE_KEY . '_grace');
-        if (!empty($grace)) {
+        if (!empty($grace) && self::isFresh($grace, self::GRACE_TTL)) {
             $grace['grace'] = true;
-            Cache::set(self::CACHE_KEY, $grace, self::GRACE_TTL);
+            Cache::set(self::CACHE_KEY, $grace);
             return $grace;
         }
 
-        // primera vez sin conexión → gracia optimista
-        $status = [
-            'active' => true,
-            'plan' => 'unknown',
-            'type' => self::getType(),
-            'features' => [],
-            'expires_at' => null,
-            'dias_restantes' => null,
-            'checked_at' => time(),
-            'grace' => true,
-        ];
-        Cache::set(self::CACHE_KEY, $status, self::GRACE_TTL);
-        return $status;
+        // Sin verificación previa + sin conexión → no conceder acceso
+        return self::unlicensed('sin_conexion');
+    }
+
+    /** Comprueba si un status cacheado sigue siendo válido según su TTL */
+    private static function isFresh(array $status, int $ttl): bool
+    {
+        return isset($status['checked_at']) && (time() - $status['checked_at']) < $ttl;
     }
 
     private static function unlicensed(string $reason = 'sin_suscripcion'): array
     {
         return [
-            'active' => false,
-            'plan' => 'none',
-            'type' => self::getType(),
-            'features' => [],
-            'expires_at' => null,
-            'dias_restantes' => null,
-            'checked_at' => time(),
-            'reason' => $reason,
+            'active'             => false,
+            'plan'               => 'none',
+            'type'               => self::getType(),
+            'features'           => [],
+            'expires_at'         => null,
+            'dias_restantes'     => null,
+            'checked_at'         => time(),
+            'reason'             => $reason,
         ];
     }
 }

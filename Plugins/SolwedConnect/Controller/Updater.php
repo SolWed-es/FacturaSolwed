@@ -137,7 +137,8 @@ class Updater extends \FacturaScripts\Core\Controller\Updater
 
         [$repo, $pluginName] = array_pad(explode(':', $github, 2), 2, $plugin->name);
         $build = SolwedGitHub::getPluginBuild($repo, $pluginName);
-        if (empty($build) || $build['version'] <= $plugin->version) {
+        // BUG FIX: version_compare en lugar de <= para evitar pérdida de precisión con floats
+        if (empty($build) || version_compare((string)$build['version'], (string)$plugin->version, '<=')) {
             return [];
         }
 

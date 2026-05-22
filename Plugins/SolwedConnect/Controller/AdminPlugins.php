@@ -101,7 +101,9 @@ class AdminPlugins extends \FacturaScripts\Core\Controller\AdminPlugins
             return;
         }
 
-        $tmpFile = Plugins::folder() . DIRECTORY_SEPARATOR . $pluginName . '.zip';
+        // BUG FIX: usar directorio Tmp, no la carpeta Plugins (deja basura si falla)
+        Tools::folderCheckOrCreate(Tools::folder('MyFiles', 'Tmp'));
+        $tmpFile = Tools::folder('MyFiles', 'Tmp') . DIRECTORY_SEPARATOR . $pluginName . '.zip';
 
         $http = Http::get($downloadUrl)->setTimeout(30);
         if (false === $http->saveAs($tmpFile)) {

@@ -17,7 +17,8 @@ class SolwedGitHub
     public static function canUpdateCore(): bool
     {
         $build = self::getCoreBuild();
-        return !empty($build) && $build['version'] > Kernel::version();
+        // BUG FIX: version_compare para evitar comparaciones float incorrectas
+        return !empty($build) && version_compare((string)$build['version'], (string)Kernel::version(), '>');
     }
 
     public static function getCoreBuild(): array
@@ -79,8 +80,10 @@ class SolwedGitHub
             return [];
         }
         $tag = $release['tag_name'] ?? '';
-        $version = (float) ltrim($tag, $stripPrefix);
-        if ($version <= 0) {
+        // BUG FIX: no usar (float) — pierde precisión en versiones como "1.2.3" → 1.2
+        // Guardamos la versión como string y comparamos con version_compare()
+        $version = ltrim($tag, $stripPrefix);
+        if (empty($version) || !preg_match('/^\d/', $version)) {
             return [];
         }
         $downloadUrl = '';
