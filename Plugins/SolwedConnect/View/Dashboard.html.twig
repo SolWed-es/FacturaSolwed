@@ -1,356 +1,74 @@
-{#
-/**
- * This file is part of FacturaScripts
- * Copyright (C) 2017-2024 Carlos Garcia Gomez <carlos@facturascripts.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- */
-#}
-{% extends "Master/MenuBghTemplate.html.twig" %}
-{% import 'Macro/Utils.html.twig' as Utils %}
+{% extends "@Core/Dashboard.html.twig" %}
 
-{% block body %}
-    <div class="bg-light pt-4 pb-4">
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <h1 class="h4">
-                        {% if fsc.getPageData().name == fsc.user.homepage %}
-                            <a class="btn btn-sm btn-secondary align-bottom active"
-                               href="{{ fsc.url() }}?defaultPage=FALSE" title="{{ trans('marked-as-homepage') }}">
-                                <i class="fa-solid fa-bookmark" aria-hidden="true"></i>
-                            </a>
-                        {% else %}
-                            <a class="btn btn-sm btn-secondary align-bottom" href="{{ fsc.url() }}?defaultPage=TRUE"
-                               title="{{ trans('mark-as-homepage') }}">
-                                <i class="far fa-bookmark" aria-hidden="true"></i>
+{% block sectionLinks %}
+    {{ parent() }}
+
+    {% if fsc.mindNotifications is defined and fsc.mindNotifications|length > 0 %}
+        <div class="col-12 mt-3" id="mind-notifications">
+            {% for notif in fsc.mindNotifications %}
+                {% set alertClass = 'alert-info' %}
+                {% if notif.tipo == 'warning' %}{% set alertClass = 'alert-warning' %}{% endif %}
+                {% if notif.tipo == 'critical' %}{% set alertClass = 'alert-danger' %}{% endif %}
+                {% if notif.tipo == 'success' %}{% set alertClass = 'alert-success' %}{% endif %}
+                <div class="alert {{ alertClass }} d-flex align-items-start mb-2" role="alert">
+                    <div class="flex-grow-1">
+                        <strong>{{ notif.titulo }}</strong>
+                        <span class="ms-2">{{ notif.mensaje }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="text-end mb-2">
+                <a href="{{ fsc.url() }}?action=dismiss-notifications"
+                   class="btn btn-sm btn-outline-secondary">
+                    {{ trans('solwedconnect-mark-read') }}
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if fsc.licenseStatus is defined and not fsc.licenseStatus.managed|default(false) %}
+        <div class="col-12 mt-3">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <small class="text-muted">{{ trans('solwedconnect-subscription') }}</small>
+                            {% if fsc.licenseStatus.active|default(false) %}
+                                <span class="badge bg-success ms-2">{{ trans('solwedconnect-status-active') }}</span>
+                                <small class="text-muted ms-2">{{ fsc.licenseStatus.plan|default('') }}</small>
+                            {% else %}
+                                <span class="badge bg-danger ms-2">{{ trans('solwedconnect-status-inactive') }}</span>
+                            {% endif %}
+                        </div>
+                        {% if fsc.licenseStatus.active|default(false) %}
+                            <a href="{{ fsc.url() }}?action=revoke-license&multireqtoken={{ fsc.multiRequestProtection.newToken() }}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('{{ trans('solwedconnect-revoke-confirm') }}')">
+                                {{ trans('solwedconnect-revoke-license') }}
                             </a>
                         {% endif %}
-                        <span class="ml-2">{{ fsc.title }}</span>
-                    </h1>
-                </div>
-                <div class="me-lg-auto col-sm-12 col-md-6 justify-content-between">
-                    <button type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#modalNews">
-                        <i class="fa-solid fa-newspaper"></i> {{ trans('news') }}
-                    </button>
-                    {% if fsc.showBackupWarning() %}
-                        <button type="button" class="btn btn-warning mb-1" data-bs-toggle="modal"
-                                data-bs-target="#modalBackup">
-                            <i class="fa-solid fa-warning"></i> {{ trans('dashboard-backup') }}
-                        </button>
-                    {% endif %}
-                    <button type="button" class="btn btn-secondary mb-1" data-bs-toggle="modal" data-bs-target="#modalHelp">
-                        <i class="fa-solid fa-circle-question"></i> {{ trans('help') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container">
-        {% block sectionLinks %}
-            <div class="row">
-                <div class="col">
-                    {{ _self.sectionLinks(fsc) }}
-                </div>
-            </div>
-        {% endblock %}
-        {% block sectionStats %}
-            {{ _self.sectionStats(fsc) }}
-        {% endblock %}
-        {% block sections %}
-            <div class="row">
-                <div class="col">
-                    {% if 'receipts' in fsc.sections %}
-                        {{ _self.sectionReceipts(fsc) }}
-                    {% endif %}
-                    {% if 'low-stock' in fsc.sections %}
-                        {{ _self.sectionLowStock(fsc) }}
-                    {% endif %}
-                </div>
-            </div>
-        {% endblock %}
-        {% if fsc.updated == false %}
-            <div class="mb-3">
-                {{ Utils.updateInstall() }}
-            </div>
-        {% elseif fsc.registered == false %}
-            <div class="mb-3">
-                {{ Utils.registerInstall() }}
-            </div>
-        {% endif %}
-        <br/>
-        <br/>
-    </div>
-    {% if fsc.showBackupWarning() %}
-        {{ _self.modalBackup() }}
-    {% endif %}
-    {{ _self.modalNews(fsc) }}
-    {{ _self.modalHelp }}
-{% endblock %}
-
-{% macro sectionLinks(fsc) %}
-    <div class="card">
-        <div class="card-body">
-            <h3 class="card-title mb-3"><i class="fa-solid fa-plus me-2"></i>{{ trans('create') }}</h3>
-            {% for link, label in fsc.createLinks %}
-                <a href="{{ link }}" class="btn btn-outline-secondary m-1 card-link">{{ trans(label) }}</a>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-body">
-            <h3 class="card-title mb-3">
-                <i class="fa-solid fa-clock-rotate-left me-2"></i>{{ trans('history') }}
-            </h3>
-
-            {% for link in fsc.openLinks %}
-                <div class="d-flex justify-content-between align-items-center border rounded p-3 mb-2">
-                    <div>
-                        <div class="font-weight-bold">{{ link.name }}</div>
-                        <small class="text-muted">{{ trans(link.type) }} · {{ link.date }}</small>
                     </div>
-                    <a href="{{ link.url }}" class="btn btn-sm btn-outline-primary" title="{{ trans('open') }}">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-{% endmacro %}
 
-{% macro sectionLowStock(fsc) %}
-    <div class="card">
-        <div class="card-body">
-            <span class="float-right badge badge-danger">⭸ {{ trans('minimum-stock') }}</span>
-            <h3 class="card-title mb-3">
-                <i class="fa-solid fa-pallet me-2"></i> {{ trans('warehouse') }}
-            </h3>
-            {% for stock in fsc.lowStock %}
-                <div class="d-flex justify-content-between align-items-center border border-danger rounded p-3 mb-2">
-                    <div>
-                        <div class="font-weight-bold">
-                            {{ stock.referencia }} • {{ stock.codalmacen }} •
-                            <small class="text-muted">{{ trans('minimum-stock') }}: {{ number(stock.stockmin) }}</small>
-                            <small class="text-muted">{{ trans('available') }}: {{ number(stock.disponible) }}</small>
-                        </div>
-                       {# <div class="text-muted">
-                            <small class="text-muted">{{ trans('minimum-stock') }}: {{ number(stock.stockmin) }}</small>
-                            <small class="text-muted">{{ trans('available') }}: {{ number(stock.disponible) }}</small>
-                        </div>#}
-                    </div>
-                    <a href="{{ receipt.url() }}" class="btn btn-sm btn-outline-primary" title="{{ trans('open') }}">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-{% endmacro %}
-
-{% macro sectionReceipts(fsc) %}
-    <div class="card">
-        <div class="card-body">
-            <span class="float-right badge badge-danger">{{ trans('unpaid') }}</span>
-            <h3 class="card-title mb-3">
-                <i class="fa-solid fa-dollar-sign me-2"></i>{{ trans('receipts') }}
-            </h3>
-            {% for receipt in fsc.receipts %}
-                <div class="d-flex justify-content-between align-items-center border border-danger rounded p-3 mb-2">
-                    <div>
-                        <div class="font-weight-bold">
-                            {{ receipt.getSubject().nombre | raw }} • {{ money(receipt.importe) }} •
-                            <small class="text-muted">{{ trans('expiration') }}: {{ receipt.vencimiento }}</small>
-                        </div>
-                        <div>
-                            <small class="text-muted">{{ receipt.observaciones | raw }}</small>
-                        </div>
-                    </div>
-                    <a href="{{ receipt.url() }}" class="btn btn-sm btn-outline-primary" title="{{ trans('open') }}">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-{% endmacro %}
-
-{% macro sectionStats(fsc) %}
-    <div class="card">
-        <div id="statusChart"></div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <script>
-        const chartData = {
-            chart: {
-                type: "area",
-                height: "400px",
-                zoom: {
-                    enabled: true,
-                    type: "x",
-                    allowMouseWheelZoom: false
-                }
-            },
-            stroke: {
-                curve: "smooth"
-            },
-            series: [
-                {% set datasets = {
-                    'purchases': 'purchases',
-                    'sales': 'sales',
-                    'taxes': 'taxes',
-                    'new-customers': 'new-customers'
-                } %}
-                {% for key, label in datasets %}
-                {
-                    name: "{{ trans(label) }}",
-                    data: [
-                        {% for k, v in fsc.stats[key] %}
-                        {{ v }}{{ not loop.last ? ',' }}
-                        {% endfor %}
-                    ]
-                }{{ not loop.last ? ',' }}
-                {% endfor %}
-            ],
-            xaxis: {
-                categories: [
-                    {% for k, v in fsc.stats['sales'] %}
-                    "{{ trans(k) }}"{{ not loop.last ? ',' }}
-                    {% endfor %}
-                ]
-            }
-        };
-
-        new ApexCharts(document.querySelector("#statusChart"), chartData).render();
-    </script>
-{% endmacro %}
-
-{% macro modalBackup() %}
-    <div class="modal fade" id="modalBackup" tabindex="-1" role="dialog" aria-labelledby="modalBackup"
-         aria-hidden="true">
-        <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content bg-warning shadow">
-                <div class="modal-header">
-                    <h3 class="modal-title">
-                        <i class="fa-solid fa-save me-2"></i>{{ trans('dashboard-backup') }}
-                    </h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-dark">
-                    <p class="card-text">{{ trans('dashboard-backup-p') }}</p>
-                    <ul class="mb-0 list-group">
-                        <li>{{ trans('dasboard-backup-li1') }}</li>
-                        <li>{{ trans('dasboard-backup-li2') }}</li>
-                        <li>{{ trans('dasboard-backup-li3') }}</li>
-                    </ul>
-
-                </div>
-                <div class="modal-footer">
-                    <a href="https://facturascripts.com/plugins/backup" target="_blank" rel="nofollow"
-                       class="btn btn-secondary"> Backup
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endmacro %}
-
-{% macro modalHelp() %}
-    <div class="modal fade" id="modalHelp" tabindex="-1" role="dialog" aria-labelledby="modalHelp"
-         aria-hidden="true">
-        <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content shadow">
-                <div class="modal-header">
-                    <h3 class="modal-title">
-                        <i class="fa-solid fa-circle-question me-2"></i>{{ trans('help') }}
-                    </h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-dark">
-                    <ul class="mb-1">
-                        <li>
-                            <a href="https://facturascripts.com/publicaciones/configuracion-15" rel="nofollow"
-                               target="_blank">{{ trans('settings') }}</a>
-                        </li>
-                        <li>
-                            <a href="https://facturascripts.com/publicaciones/primeros-pasos-303" rel="nofollow"
-                               target="_blank">Primeros pasos</a>
-                        </li>
-                        <li>
-                            <a href="https://facturascripts.com/publicaciones/problemas-frecuentes-469" rel="nofollow"
-                               target="_blank">Problemas frecuentes</a>
-                        </li>
-                        <li>
-                            <a href="https://forms.gle/WhGgWWB6EbWjBNna6" rel="nofollow"
-                               target="_blank">Encuesta de uso 2024/25
-                                <i class="fa-solid fa-clipboard-check"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://facturascripts.com/contacto" rel="nofollow" target="_blank">Soporte
-                                <i class="far fa-comment-dots"></i></a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endmacro %}
-
-{% macro modalNews(fsc) %}
-    <div class="modal fade" id="modalNews" tabindex="-1" role="dialog" aria-labelledby="modalNews" aria-hidden="true">
-        <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content shadow">
-                <div class="modal-header">
-                    <h3 class="modal-title">{{ trans('news') }}</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {% for news in fsc.news %}
-                        <div class="row">
-                            <div class="col">
-                                <div class="card shadow mb-3">
-                                    <div class="card-header">
-                                        <span class="float-right">{{ news.fecha }}</span>
-                                        <a href="{{ news.url }}" target="_blank">{{ news.title | raw }}</a>
-                                    </div>
-                                    <div class="card-body p-3">
-                                        <div class="row align-items-center">
-                                            <div class="col-auto">
-                                                <a href="{{ news.url }}" target="_blank"
-                                                   class="btn btn-outline-secondary">
-                                                    <i class="far fa-newspaper fa-3x"></i>
-                                                </a>
-                                            </div>
-                                            <div class="col">{{ news.body | raw }}</div>
-                                        </div>
-                                    </div>
-                                </div>
+                    {% if not fsc.licenseStatus.active|default(false) %}
+                        <form method="post" action="{{ fsc.url() }}" class="mt-3">
+                            <input type="hidden" name="action" value="activate-license">
+                            <input type="hidden" name="multireqtoken" value="{{ fsc.multiRequestProtection.newToken() }}">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="license_code" class="form-control"
+                                       placeholder="{{ trans('solwedconnect-activation-code-placeholder') }}"
+                                       autocomplete="off" required>
+                                <button type="submit" class="btn btn-primary">
+                                    {{ trans('solwedconnect-activate-license') }}
+                                </button>
+                                <a href="https://app.solwed.es/servicios/erp" target="_blank"
+                                   class="btn btn-outline-secondary">
+                                    {{ trans('solwedconnect-get-code') }}
+                                </a>
                             </div>
-                        </div>
-                    {% endfor %}
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
-{% endmacro %}
-
-
+    {% endif %}
+{% endblock %}

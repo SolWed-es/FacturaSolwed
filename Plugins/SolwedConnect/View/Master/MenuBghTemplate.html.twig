@@ -1,58 +1,67 @@
-{#
-/**
- * This file is part of FacturaScripts
- * Copyright (C) 2017-2023 Carlos Garcia Gomez <carlos@facturascripts.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- */
-#}
 {% import 'Macro/GoogleTagManager.html.twig' as GoogleTagManager %}
 {% extends "Master/MenuTemplate.html.twig" %}
 
 {% block fullBody %}
-    <body>
-    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-sidebartype="full">
-        {{ GoogleTagManager.body() }}
-        {% block navbar %}
+<body>
+{{ GoogleTagManager.body() }}
+
+{# Sidebar Solwed #}
+<nav class="solwed-sidebar d-print-none" id="solwedSidebar">
+    <div class="sidebar-brand">
+        <a href="{{ asset(fsc.user.homepage) }}">
+            <img src="{{ asset('Dinamic/Assets/Images/horizontal-logo.png') }}"
+                 class="sidebar-brand-logo"
+                 alt="{{ fsc.empresa.nombrecorto | raw }}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="sidebar-brand-name" style="display:none">{{ fsc.empresa.nombrecorto | raw }}</span>
+        </a>
+    </div>
+    <div class="sidebar-nav">
+        {% import 'Macro/Menu.html.twig' as macros %}
+        {% for menuItem in menuManager.getMenu() %}
+            {{ macros.showMenu(menuItem) }}
+        {% endfor %}
+    </div>
+    <div class="sidebar-powered">
+        <a href="https://solwed.es" target="_blank" rel="noopener">
+            Powered by Solwed
+        </a>
+    </div>
+</nav>
+
+{# Main wrapper #}
+<div class="solwed-main">
+
+    {# Header Solwed — sustituye navbar Bootstrap #}
+    {% include '@PluginSolwedConnect/Master/AppHeader.html.twig' %}
+
+    {# Ocultar navbar Bootstrap original #}
+    {% block navbar %}{% endblock %}
+
+    {# Mensajes y opciones de cabecera de página #}
+    <div class="pt-3">
+        {% block messages %}
             {{ parent() }}
         {% endblock %}
-        <div class="body-wrapper">
-            <!--  Header Start -->
-            {% include 'Master/AppHeader.html.twig' %}
-            <!--  Header End -->
-            <div class="body-wrapper-inner">
-                {% block messages %}
-                    {{ parent() }}
-                {% endblock %}
-                {% block bodyHeaderOptions %}
-                    {{ parent() }}
-                {% endblock %}
-                {% block body %}
-                    {{ parent() }}
-                {% endblock %}
-                <br/>
-                <br/>
-            </div>
-        </div>
-        {% for includeView in getIncludeViews('MenuTemplate', 'JsFooter') %}
-            {% include includeView['path'] %}
-        {% endfor %}
-        {% for includeView in getIncludeViews('MenuTemplate', 'BodyEnd') %}
-            {% include includeView['path'] %}
-        {% endfor %}
-        {{ debugBarRender.render() | raw }}
-        <!-- execution time: {{ executionTime() }} s -->
+        {% block bodyHeaderOptions %}
+            {{ parent() }}
+        {% endblock %}
     </div>
-    </body>
+
+    {# Contenido principal #}
+    {% block body %}
+        {{ parent() }}
+    {% endblock %}
+
+</div>{# /.solwed-main #}
+
+{% for includeView in getIncludeViews('MenuTemplate', 'JsFooter') %}
+    {% include includeView['path'] %}
+{% endfor %}
+{% for includeView in getIncludeViews('MenuTemplate', 'BodyEnd') %}
+    {% include includeView['path'] %}
+{% endfor %}
+{{ debugBarRender.render() | raw }}
+<!-- execution time: {{ executionTime() }} s -->
+</body>
 {% endblock %}
