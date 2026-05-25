@@ -5,4 +5,11 @@
 <script src="{{ asset('Dinamic/Assets/JS/sidebar.js') }}"></script>
 <script>
     if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+
+    // Deshabilitar botón Desactivar de SolwedConnect en AdminPlugins
+    document.querySelectorAll('a[href*="action=disable&plugin=SolwedConnect"]').forEach(function(el) {
+        el.classList.add('disabled');
+        el.setAttribute('aria-disabled', 'true');
+        el.addEventListener('click', function(e) { e.preventDefault(); });
+    });
 </script>
