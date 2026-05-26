@@ -494,6 +494,18 @@ body:has(.solwed-sidebar.collapsed) .solwed-main {
   height: 14px;
   width: auto;
 }
+/* Light theme: dark logo visible, light logo hidden */
+[data-theme="solwed-light"] .sidebar-powered-logo--dark,
+:root .sidebar-powered-logo--dark {
+  display: none;
+}
+/* Dark theme: light logo visible, dark logo hidden */
+[data-theme="solwed-dark"] .sidebar-powered-logo--light {
+  display: none;
+}
+[data-theme="solwed-dark"] .sidebar-powered-logo--dark {
+  display: inline;
+}
 .solwed-sidebar.collapsed .sidebar-powered { display: none; }
 
 .solwed-sidebar.collapsed .sidebar-label,

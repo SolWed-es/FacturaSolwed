@@ -2,6 +2,8 @@
     "solwedconnect-subscription": "Suscripción Solwed",
     "solwedconnect-status-active": "Activa",
     "solwedconnect-status-inactive": "Inactiva",
+    "solwedconnect-status-offline": "Sin conexión",
+    "solwedconnect-status-grace": "Verificando...",
     "solwedconnect-plan": "Plan",
     "solwedconnect-activate-license": "Activar licencia",
     "solwedconnect-revoke-license": "Quitar licencia",

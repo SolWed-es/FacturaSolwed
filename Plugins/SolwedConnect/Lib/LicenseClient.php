@@ -88,16 +88,20 @@ class LicenseClient
 
     public static function clearCache(): void
     {
+        // Solo borra la caché principal para forzar re-verificación.
+        // La grace cache se mantiene intacta para cubrir cortes de API.
         Cache::delete(self::CACHE_KEY);
-        Cache::delete(self::CACHE_KEY . '_grace');
     }
 
     public static function revoke(): void
     {
         Tools::settingsSet('solwedconnect', 'mind_token', '');
         Tools::settingsSet('solwedconnect', 'instalacion_id', '');
+        Tools::settingsSet('solwedconnect', 'last_known_plan', 'none');
         Tools::settingsSave();
-        self::clearCache();
+        // Al revocar sí borramos todo, incluida la grace
+        Cache::delete(self::CACHE_KEY);
+        Cache::delete(self::CACHE_KEY . '_grace');
     }
 
     // ── Activación self-hosted ────────────────────────────────────────────────
@@ -135,19 +139,27 @@ class LicenseClient
     {
         $status = $payload['status'] ?? '';
         $plan   = str_replace('erp-', '', $payload['producto'] ?? '');
+        $active = in_array($status, ['active', 'trialing'], true);
 
         $newStatus = [
-            'active'     => in_array($status, ['active', 'trialing'], true),
+            'active'     => $active,
             'plan'       => $plan,
             'type'       => self::getType(),
             'features'   => self::FEATURES[$plan] ?? [],
             'expires_at' => $payload['expires_at'] ?? null,
             'checked_at' => time(),
-            'reason'     => ($status !== 'active') ? $status : null,
+            'reason'     => $active ? null : $status,
         ];
 
-        // BUG FIX: Cache::set() no acepta TTL — guardamos timestamp para TTL manual
+        // Persistir plan en DB para sobrevivir cortes largos de internet
+        if ($active && $plan !== 'none') {
+            Tools::settingsSet('solwedconnect', 'last_known_plan', $plan);
+            Tools::settingsSave();
+        }
+
         Cache::set(self::CACHE_KEY, $newStatus);
+        // Webhook es una verificación autoritativa — actualizar también la grace
+        Cache::set(self::CACHE_KEY . '_grace', $newStatus);
     }
 
     // ── Privado ───────────────────────────────────────────────────────────────
@@ -174,7 +186,11 @@ class LicenseClient
                     'instalacion_nombre'  => $data['instalacion_nombre'] ?? null,
                     'checked_at'          => time(),
                 ];
-                // BUG FIX: sin TTL — gestionado con checked_at
+                // Persistir plan en DB para que sobreviva borrados de caché y cortes largos
+                if ($status['active'] && $plan !== 'none') {
+                    Tools::settingsSet('solwedconnect', 'last_known_plan', $plan);
+                    Tools::settingsSave();
+                }
                 Cache::set(self::CACHE_KEY, $status);
                 Cache::set(self::CACHE_KEY . '_grace', $status);
                 return $status;
@@ -197,7 +213,7 @@ class LicenseClient
             // sin conexión — caer al bloque offline
         }
 
-        // Gracia si hubo verificación exitosa previa
+        // Gracia si hubo verificación exitosa previa (< 72h)
         $grace = Cache::get(self::CACHE_KEY . '_grace');
         if (!empty($grace) && self::isFresh($grace, self::GRACE_TTL)) {
             $grace['grace'] = true;
@@ -205,19 +221,20 @@ class LicenseClient
             return $grace;
         }
 
-        // Sin conexión (ni previa ni ahora) → funciona con plan mínimo.
-        // El token es válido localmente; la API de gestión remota requiere
-        // internet de todas formas, así que no se pierde control.
+        // Sin conexión prolongada: usa el último plan verificado guardado en DB.
+        // El ERP nunca se bloquea; la API de gestión remota requiere internet
+        // de todas formas, así que no se pierde control de Solwed.
+        $lastPlan = Tools::settings('solwedconnect', 'last_known_plan', 'none');
         $offline = [
-            'active'      => true,
-            'plan'        => 'none',
-            'type'        => self::getType(),
-            'features'    => [],
-            'expires_at'  => null,
+            'active'         => true,
+            'plan'           => $lastPlan,
+            'type'           => self::getType(),
+            'features'       => self::FEATURES[$lastPlan] ?? [],
+            'expires_at'     => null,
             'dias_restantes' => null,
-            'checked_at'  => time(),
-            'offline'     => true,
-            'reason'      => 'offline',
+            'checked_at'     => time(),
+            'offline'        => true,
+            'reason'         => 'offline',
         ];
         Cache::set(self::CACHE_KEY, $offline);
         return $offline;

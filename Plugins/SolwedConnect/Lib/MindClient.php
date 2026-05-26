@@ -64,12 +64,13 @@ class MindClient
         }
 
         try {
-            Http::put(self::baseUrl() . '/fs/eventos/instalacion/' . $instalacionId . '/telemetria', [
+            Http::put(self::baseUrl() . '/fs/eventos/instalacion/' . $instalacionId . '/telemetria', json_encode([
                 'plugins'    => $plugins,
                 'user_count' => $userCount,
                 'fs_version' => $fsVersion,
                 'plan'       => $plan,
-            ])
+            ]))
+                ->setHeader('Content-Type', 'application/json')
                 ->setHeader('X-Mind-Token', $token)
                 ->setTimeout(5)
                 ->ok();

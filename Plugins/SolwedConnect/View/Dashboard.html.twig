@@ -34,7 +34,15 @@
                         <div>
                             <small class="text-muted">{{ trans('solwedconnect-subscription') }}</small>
                             {% if fsc.licenseStatus.active|default(false) %}
-                                <span class="badge bg-success ms-2">{{ trans('solwedconnect-status-active') }}</span>
+                                {% if fsc.licenseStatus.offline|default(false) %}
+                                    <span class="badge bg-warning text-dark ms-2">
+                                        <i class="fa-solid fa-wifi-slash fa-xs me-1"></i>{{ trans('solwedconnect-status-offline') }}
+                                    </span>
+                                {% elseif fsc.licenseStatus.grace|default(false) %}
+                                    <span class="badge bg-warning text-dark ms-2">{{ trans('solwedconnect-status-grace') }}</span>
+                                {% else %}
+                                    <span class="badge bg-success ms-2">{{ trans('solwedconnect-status-active') }}</span>
+                                {% endif %}
                                 <small class="text-muted ms-2">{{ fsc.licenseStatus.plan|default('') }}</small>
                             {% else %}
                                 <span class="badge bg-danger ms-2">{{ trans('solwedconnect-status-inactive') }}</span>

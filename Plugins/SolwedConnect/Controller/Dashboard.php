@@ -3,9 +3,9 @@ namespace FacturaScripts\Plugins\SolwedConnect\Controller;
 
 use FacturaScripts\Core\Cache;
 use FacturaScripts\Core\Tools;
+use FacturaScripts\Core\Internal\Forja;
 use FacturaScripts\Plugins\SolwedConnect\Lib\LicenseClient;
 use FacturaScripts\Plugins\SolwedConnect\Lib\MindClient;
-use FacturaScripts\Plugins\SolwedConnect\Lib\SolwedGitHub;
 
 /**
  * Sobreescribe Dashboard de NeoRazorX:
@@ -45,7 +45,11 @@ class Dashboard extends \FacturaScripts\Core\Controller\Dashboard
             if (empty($code)) {
                 Tools::log()->warning('Introduce un código de activación.');
             } else {
-                $result = LicenseClient::activate($code, Tools::settings('default', 'site_url', ''), '');
+                $siteUrl = Tools::settings('default', 'site_url', '');
+                if (empty($siteUrl)) {
+                    $siteUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+                }
+                $result = LicenseClient::activate($code, $siteUrl, $this->empresa->nombre ?? '');
                 if ($result['ok'] ?? false) {
                     Tools::log()->notice('Licencia activada correctamente.');
                 } else {
@@ -72,7 +76,7 @@ class Dashboard extends \FacturaScripts\Core\Controller\Dashboard
 
         // Sin licencia: ocultar botón de update + aviso prominente
         $this->updated = $licenseActive
-            ? SolwedGitHub::canUpdateCore() === false
+            ? Forja::canUpdateCore() === false
             : true;
 
         if (!$licenseActive && LicenseClient::getType() !== 'managed') {
