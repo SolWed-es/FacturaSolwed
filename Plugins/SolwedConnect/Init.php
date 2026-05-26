@@ -4,20 +4,16 @@ namespace FacturaScripts\Plugins\SolwedConnect;
 use FacturaScripts\Core\Kernel;
 use FacturaScripts\Core\Template\InitClass;
 use FacturaScripts\Core\Tools;
-use FacturaScripts\Plugins\SolwedConnect\Extension\Model\Cliente;
-use FacturaScripts\Plugins\SolwedConnect\Extension\Model\FacturaCliente;
-use FacturaScripts\Plugins\SolwedConnect\Extension\Model\ReciboCliente;
 
 class Init extends InitClass
 {
     public function init(): void
     {
-        $this->loadExtension(new Cliente());
-        $this->loadExtension(new FacturaCliente());
-        $this->loadExtension(new ReciboCliente());
-
         // ruta del webhook de suscripción (recibe notificaciones de app.solwed.es)
         Kernel::addRoute('/SolwedWebhook', 'SolwedWebhook', 5);
+
+        // API de gestión remota — w-api puede instalar/actualizar plugins y core
+        Kernel::addRoute('/api/3/solwedupdate', 'ApiSolwedUpdate', -1);
     }
 
     public function update(): void
@@ -27,7 +23,7 @@ class Init extends InitClass
         $envType  = getenv('FS_INSTANCE_TYPE') ?: 'self-hosted';
 
         $defaults = [
-            'mind_url'      => 'https://mind.solwed.es',
+            'mind_url'      => 'https://api.solwed.es',
             'mind_token'    => $envToken,
             'license_key'   => '',
             'instance_type' => $envType,

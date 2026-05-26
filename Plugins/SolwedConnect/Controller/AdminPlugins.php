@@ -4,15 +4,15 @@ namespace FacturaScripts\Plugins\SolwedConnect\Controller;
 use FacturaScripts\Core\Http;
 use FacturaScripts\Core\Plugins;
 use FacturaScripts\Core\Tools;
+use FacturaScripts\Core\Internal\Forja;
 use FacturaScripts\Plugins\SolwedConnect\Lib\LicenseClient;
-use FacturaScripts\Plugins\SolwedConnect\Lib\SolwedGitHub;
 use FacturaScripts\Plugins\SolwedConnect\Lib\SolwedGitHubPlugins;
 
 /**
  * Sobreescribe AdminPlugins de NeoRazorX:
  * - Elimina Forja y Telemetry
  * - Usa SolwedGitHubPlugins como tienda de plugins
- * - Usa SolwedGitHub para detectar updates del core
+ * - Usa Forja (facturascripts.com) para detectar updates del core
  * - Protege SolwedConnect de desinstalación en instancias managed
  */
 class AdminPlugins extends \FacturaScripts\Core\Controller\AdminPlugins
@@ -36,7 +36,7 @@ class AdminPlugins extends \FacturaScripts\Core\Controller\AdminPlugins
         // Con licencia: mostrar si hay update disponible
         // Sin licencia: ocultar botón update pero mostrar aviso
         $this->updated = $licenseActive
-            ? SolwedGitHub::canUpdateCore() === false
+            ? Forja::canUpdateCore() === false
             : true;  // "ya actualizado" → oculta el botón
 
         // Aviso de suscripción inactiva
@@ -63,7 +63,7 @@ class AdminPlugins extends \FacturaScripts\Core\Controller\AdminPlugins
     protected function removePluginAction(): void
     {
         $pluginName = $this->request->queryOrInput('plugin', '');
-        if ($pluginName === 'SolwedConnect' && LicenseClient::isManaged()) {
+        if ($pluginName === 'SolwedConnect') {
             Tools::log()->warning('solwedconnect-protected');
             return;
         }
@@ -73,7 +73,7 @@ class AdminPlugins extends \FacturaScripts\Core\Controller\AdminPlugins
     protected function disablePluginAction(): void
     {
         $pluginName = $this->request->queryOrInput('plugin', '');
-        if ($pluginName === 'SolwedConnect' && LicenseClient::isManaged()) {
+        if ($pluginName === 'SolwedConnect') {
             Tools::log()->warning('solwedconnect-protected');
             return;
         }

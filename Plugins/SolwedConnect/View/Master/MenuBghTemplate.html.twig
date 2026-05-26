@@ -1,0 +1,72 @@
+{% import 'Macro/GoogleTagManager.html.twig' as GoogleTagManager %}
+{% extends "Master/MenuTemplate.html.twig" %}
+
+{% block fullBody %}
+<body>
+{{ GoogleTagManager.body() }}
+
+{# Sidebar Solwed #}
+<nav class="solwed-sidebar d-print-none" id="solwedSidebar">
+    <div class="sidebar-brand">
+        <a href="{{ asset(fsc.user.homepage) }}">
+            <img src="{{ asset('Dinamic/Assets/Images/horizontal-logo.png') }}"
+                 class="sidebar-brand-logo"
+                 alt="{{ fsc.empresa.nombrecorto | raw }}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="sidebar-brand-name" style="display:none">{{ fsc.empresa.nombrecorto | raw }}</span>
+        </a>
+    </div>
+    <div class="sidebar-nav">
+        {% import 'Macro/Menu.html.twig' as macros %}
+        {% for menuItem in menuManager.getMenu() %}
+            {{ macros.showMenu(menuItem) }}
+        {% endfor %}
+    </div>
+    <div class="sidebar-powered">
+        <a href="https://solwed.es" target="_blank" rel="noopener">
+            <img src="{{ asset('Dinamic/Assets/Images/logo-oscuro.png') }}"
+                 class="sidebar-powered-logo sidebar-powered-logo--light"
+                 alt="Solwed">
+            <img src="{{ asset('Dinamic/Assets/Images/logo-claro.png') }}"
+                 class="sidebar-powered-logo sidebar-powered-logo--dark"
+                 alt="Solwed">
+        </a>
+    </div>
+</nav>
+
+{# Main wrapper #}
+<div class="solwed-main">
+
+    {# Header Solwed — sustituye navbar Bootstrap #}
+    {% include '@PluginSolwedConnect/Master/AppHeader.html.twig' %}
+
+    {# Ocultar navbar Bootstrap original #}
+    {% block navbar %}{% endblock %}
+
+    {# Mensajes y opciones de cabecera de página #}
+    <div class="pt-3">
+        {% block messages %}
+            {{ parent() }}
+        {% endblock %}
+        {% block bodyHeaderOptions %}
+            {{ parent() }}
+        {% endblock %}
+    </div>
+
+    {# Contenido principal #}
+    {% block body %}
+        {{ parent() }}
+    {% endblock %}
+
+</div>{# /.solwed-main #}
+
+{% for includeView in getIncludeViews('MenuTemplate', 'JsFooter') %}
+    {% include includeView['path'] %}
+{% endfor %}
+{% for includeView in getIncludeViews('MenuTemplate', 'BodyEnd') %}
+    {% include includeView['path'] %}
+{% endfor %}
+{{ debugBarRender.render() | raw }}
+<!-- execution time: {{ executionTime() }} s -->
+</body>
+{% endblock %}

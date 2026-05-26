@@ -1,0 +1,15 @@
+{# SolwedConnect — JS del tema: sidebar, theme toggle, Lucide icons #}
+<script src="{{ asset('Dinamic/Assets/JS/lucide.min.js') }}"></script>
+<script src="{{ asset('Dinamic/Assets/JS/theme.js') }}"></script>
+<script src="{{ asset('Dinamic/Assets/JS/ThemeToggle.js') }}"></script>
+<script src="{{ asset('Dinamic/Assets/JS/sidebar.js') }}"></script>
+<script>
+    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+
+    // Deshabilitar botón Desactivar de SolwedConnect en AdminPlugins
+    document.querySelectorAll('a[href*="action=disable&plugin=SolwedConnect"]').forEach(function(el) {
+        el.classList.add('disabled');
+        el.setAttribute('aria-disabled', 'true');
+        el.addEventListener('click', function(e) { e.preventDefault(); });
+    });
+</script>

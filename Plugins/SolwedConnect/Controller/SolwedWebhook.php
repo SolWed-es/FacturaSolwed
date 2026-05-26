@@ -31,8 +31,7 @@ class SolwedWebhook implements ControllerInterface
     {
         header('Content-Type: application/json');
 
-        // BUG FIX: usar filter_input en lugar de $_SERVER directo
-        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD') ?? $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         if ($method !== 'POST') {
             http_response_code(405);
             echo json_encode(['error' => 'Method not allowed']);
